@@ -64,7 +64,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             // Create clone
             var clone = GameObject.Instantiate(
                 healthManager.gameObject,
-                healthManager.transform.position + Vector3.right * 0.5f + Vector3.back * 0.01f, 
+                healthManager.transform.position + Vector3.right * 0.05f + Vector3.back * 0.01f, 
                 healthManager.transform.rotation,
                 healthManager.transform.parent
             );
