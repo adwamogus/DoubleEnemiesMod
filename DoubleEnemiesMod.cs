@@ -8,6 +8,7 @@ using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Device;
 using UnityEngine.SceneManagement;
@@ -17,6 +18,8 @@ public class DoubleEnemiesMod : BaseUnityPlugin
 {
     private static readonly string[] Blacklist = new string[]
     {
+        "Coral Warrior",
+        "Coral Flyer",
     };
     private static ManualLogSource logger;
     private void Awake()
@@ -64,7 +67,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             // Create clone
             var clone = GameObject.Instantiate(
                 healthManager.gameObject,
-                healthManager.transform.position + Vector3.back * 0.01f, 
+                healthManager.transform.position, 
                 healthManager.transform.rotation,
                 healthManager.transform.parent
             );
@@ -96,13 +99,16 @@ public class CloneMarker : MonoBehaviour
         this.logger = logger;
         
     }
-    // Sync loop for bosses who have long intro animations
+    // Sync loop for enemies who have long intro animations
     private void Update()
     {
         if (isSynced || original == null) return;
 
+        //Sync
         var activeStateName = original.GetComponent<PlayMakerFSM>().Fsm.ActiveStateName;
         GetComponent<PlayMakerFSM>().SetState(activeStateName);
+        transform.position = original.transform.position;
+
 
         if (logger != null && activeStateName != lastLoggedState)
         {
@@ -134,5 +140,13 @@ public static class StateList
         "Dormant",
         "Zoom Down", // Moorwing
         "Spear Spawn Pause", // Coral Tower Spawn
+        "Burst Out",
+        "Fly In",
+        "Jump Away Air",
+        "Burst Out?",
+        "Spawn Antic",
+        "Spawn",
+        "BG Dance",
+        "Challenge Pause",
     };
 }
