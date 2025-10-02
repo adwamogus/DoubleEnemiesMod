@@ -35,7 +35,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             BepInEx.Logging.Logger.CreateLogSource("DoubleEnemiesMod").LogInfo(msg);
     }
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(HealthManager), "OnEnable")]
+    [HarmonyPatch(typeof(HealthManager), "Start")]
     private static void OnHealthManagerEnabled(HealthManager __instance)
     {
         if (__instance == null) return;
@@ -64,11 +64,11 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             // Create clone
             var clone = GameObject.Instantiate(
                 healthManager.gameObject,
-                healthManager.transform.position + Vector3.right * 0.05f + Vector3.back * 0.01f, 
+                healthManager.transform.position + Vector3.back * 0.01f, 
                 healthManager.transform.rotation,
                 healthManager.transform.parent
             );
-
+            clone.GetComponent<CloneMarker>().CopyState(healthManager, logger); 
             // Log clone
             Log($"[Clone] {healthManager.name} -> {clone.name} in scene {healthManager.gameObject.scene.name}");
         }
@@ -77,10 +77,52 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             Log($"[Error] Error while duplicating {healthManager?.name}: {ex}");
         }
     }
+    
 }
 
-// Empty component for clone detection
+// component for clone detection
 public class CloneMarker : MonoBehaviour
 {
+    private HealthManager original;
+    private ManualLogSource logger;
 
+    private bool isSynced = false;
+
+    public void CopyState(HealthManager original, ManualLogSource logger)
+    {
+        this.original = original;
+        this.logger = logger;
+        
+    }
+    // Sync loop for bosses who have long intro animations
+    private void Update()
+    {
+        if (isSynced || original == null) return;
+
+        var activeStateName = original.GetComponent<PlayMakerFSM>().Fsm.ActiveStateName;
+        GetComponent<PlayMakerFSM>().SetState(activeStateName);
+        logger?.LogInfo(activeStateName);
+
+        bool found = false;
+        foreach(var state in StateList.SyncStates)
+        {
+            if (state == activeStateName)
+            {
+                found = true;
+            }
+        }
+        if (!found)
+        {
+            isSynced = true;
+        }
+    }
+}
+
+public static class StateList
+{
+    public static readonly string[] SyncStates = new string[]
+    {
+        "Pause",
+        "Dormant",
+    };
 }
