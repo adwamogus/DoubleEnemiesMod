@@ -48,36 +48,43 @@ public class DoubleEnemiesMod : BaseUnityPlugin
     {
         try
         {
+            GameObject gameObject = healthManager.gameObject;
             // Ignore if already a clone
-            if (healthManager.GetComponent<CloneMarker>() != null) return;
+            if (gameObject.GetComponent<CloneMarker>() != null) return;
 
             // Blacklist check
             foreach (var blocked in Blacklist)
             {
-                if (healthManager.name.Contains(blocked) || healthManager.gameObject.name.Contains(blocked))
+                if (gameObject.name.Contains(blocked) || gameObject.name.Contains(blocked))
                 {
-                    Log($"[Blacklist] Skipped: {healthManager.name} ({healthManager.gameObject.name}) in scene {healthManager.gameObject.scene.name}");
+                    Log($"[Blacklist] Skipped: {gameObject.name} ({gameObject.name}) in scene {gameObject.scene.name}");
                     return;
                 }
             }
 
+            var parent = gameObject.transform.parent;
+            if (parent != null)
+            {
+                Log($"[{gameObject.name}] Parent name: {parent.gameObject.name}");
+            }
+
             // Mark the original object before cloning
-            healthManager.gameObject.AddComponent<CloneMarker>();
+            gameObject.AddComponent<CloneMarker>();
 
             // Create clone
             var clone = GameObject.Instantiate(
-                healthManager.gameObject,
-                healthManager.transform.position, 
-                healthManager.transform.rotation,
-                healthManager.transform.parent
+                gameObject,
+                gameObject.transform.position, 
+                gameObject.transform.rotation,
+                gameObject.transform.parent
             );
-            clone.GetComponent<CloneMarker>().CopyState(healthManager, logger); 
+            clone.GetComponent<CloneMarker>().CopyState(gameObject, logger); 
             // Log clone
-            Log($"[Clone] {healthManager.name} -> {clone.name} in scene {healthManager.gameObject.scene.name}");
+            Log($"[Clone] {gameObject.name} -> {clone.name} in scene {gameObject.gameObject.scene.name}");
         }
         catch (Exception ex)
         {
-            Log($"[Error] Error while duplicating {healthManager?.name}: {ex}");
+            Log($"[Error] Error while duplicating {healthManager.gameObject?.name}: {ex}");
         }
     }
     
@@ -86,14 +93,14 @@ public class DoubleEnemiesMod : BaseUnityPlugin
 // component for clone detection
 public class CloneMarker : MonoBehaviour
 {
-    private HealthManager original;
+    private GameObject original;
     private ManualLogSource logger;
 
     private bool isSynced = false;
 
     private string lastLoggedState = "";
 
-    public void CopyState(HealthManager original, ManualLogSource logger)
+    public void CopyState(GameObject original, ManualLogSource logger)
     {
         this.original = original;
         this.logger = logger;
@@ -152,5 +159,16 @@ public static class StateList
         "Battle Roar",
         "Battle Roar End",
         "Battle Dance",
+        "Clover Ready", // Clover Dancer
+        "",
+        "Clover Sub Roar",
+        "Clover Roar",
+        //"Idle",
+        "Rest", // Cogwork Dancer
+        "Windup Ready",
+        "Windup",
+        "Emerge",
+        "Do Roar",
+        "Sub roar",
     };
 }
