@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.Device;
 using UnityEngine.SceneManagement;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.1.0")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "1.0.0")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     private static readonly string[] Blacklist = new string[]
