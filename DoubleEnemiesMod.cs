@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using HutongGames.PlayMaker;
@@ -16,26 +17,41 @@ using UnityEngine.SceneManagement;
 [BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.2.0")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
-    private static readonly string[] Blacklist = new string[]
-    {
-        "Coral Warrior",
-        "Coral Flyer",
-    };
+    public static ConfigEntry<int> Multiplier;
+
+    public static ConfigEntry<bool> debugLog;
+
     private static ManualLogSource logger;
     private void Awake()
     {
         logger = Logger;
+
+        Multiplier = Config.Bind(
+            "General",
+            "Multiplier",
+            2,
+            "Enemy * Multiplier = the amount of enemies spawned"
+            );
+
+        debugLog = Config.Bind(
+            "Debug",
+            "DebugLog",
+            false,
+            "For development"
+            );
+
         Log("Double Enemies Mod loaded");
-
         Harmony.CreateAndPatchAll(typeof(DoubleEnemiesMod));
-
     }
     public static void Log(string msg)
     {
-        if (logger != null)
-            logger.LogInfo(msg);
-        else
-            BepInEx.Logging.Logger.CreateLogSource("DoubleEnemiesMod").LogInfo(msg);
+        if (debugLog.Value)
+        {
+            if (logger != null)
+                logger.LogInfo(msg);
+            else
+                BepInEx.Logging.Logger.CreateLogSource("DoubleEnemiesMod").LogInfo(msg);
+        }
     }
     [HarmonyPostfix]
     [HarmonyPatch(typeof(HealthManager), "Start")]
@@ -53,7 +69,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             if (gameObject.GetComponent<CloneMarker>() != null || gameObject.GetComponentInParent<CloneMarker>() != null) return;
 
             // Blacklist check
-            foreach (var blocked in Blacklist)
+            foreach (var blocked in StringLists.Blacklist)
             {
                 if (gameObject.name.Contains(blocked) || gameObject.name.Contains(blocked))
                 {
@@ -69,7 +85,6 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                 foreach (var keyword in StringLists.BossParentKeywords) {
                     if (parentName.Contains(keyword))
                     {
-                        Log("OMG WUNTERKINT");
                         CloneObject(current.gameObject);
                         return;
                     }
@@ -91,17 +106,21 @@ public class DoubleEnemiesMod : BaseUnityPlugin
         // Mark the original object before cloning
         gameObject.AddComponent<CloneMarker>();
 
-        // Create clone
-        var clone = GameObject.Instantiate(
-            gameObject,
-            gameObject.transform.position + Vector3.back * 0.01f,
-            gameObject.transform.rotation,
-            gameObject.transform.parent
-        );
-        clone.GetComponent<CloneMarker>().CopyState(gameObject, logger);
+        Log($"{Multiplier.Value}");
+        for(int i = 0; i < Multiplier.Value - 1; i++)
+        {
+            // Create clone
+            var clone = GameObject.Instantiate(
+                gameObject,
+                gameObject.transform.position + Vector3.back * 0.01f,
+                gameObject.transform.rotation,
+                gameObject.transform.parent
+            );
+            clone.GetComponent<CloneMarker>().CopyState(gameObject);
 
-        // Log clone
-        Log($"[Clone] {gameObject.name} -> {clone.name} in scene {gameObject.gameObject.scene.name}");
+            // Log clone
+            Log($"[Clone] {gameObject.name} -> {clone.name} in scene {gameObject.gameObject.scene.name}");
+        }
     }
 }
 
@@ -109,17 +128,14 @@ public class DoubleEnemiesMod : BaseUnityPlugin
 public class CloneMarker : MonoBehaviour
 {
     private GameObject original;
-    private ManualLogSource logger;
 
     private bool isSynced = false;
 
     private string lastLoggedState = "";
 
-    public void CopyState(GameObject original, ManualLogSource logger)
+    public void CopyState(GameObject original)
     {
         this.original = original;
-        this.logger = logger;
-        
     }
     // Sync loop for enemies who have long intro animations
     private void Update()
@@ -131,10 +147,9 @@ public class CloneMarker : MonoBehaviour
         GetComponent<PlayMakerFSM>().SetState(activeStateName);
         transform.position = original.transform.position;
 
-
-        if (logger != null && activeStateName != lastLoggedState)
+        if (activeStateName != lastLoggedState)
         {
-            logger.LogInfo($"[{gameObject.name}] Current state: {activeStateName}");
+            DoubleEnemiesMod.Log($"[{gameObject.name}] Current state: {activeStateName}");
             lastLoggedState = activeStateName;
         }
 
@@ -149,13 +164,18 @@ public class CloneMarker : MonoBehaviour
         if (!found)
         {
             isSynced = true;
-            logger?.LogInfo($"[{gameObject.name}] Stopped syncing: {activeStateName}");
+            DoubleEnemiesMod.Log($"[{gameObject.name}] Stopped syncing: {activeStateName}");
         }
     }
 }
 
 public static class StringLists
 {
+    public static readonly string[] Blacklist = new string[]
+    {
+        "Coral Warrior",
+        "Coral Flyer",
+    };
     public static readonly string[] SyncStates = new string[]
     {
         "Pause", // Lost Lace
@@ -174,18 +194,7 @@ public static class StringLists
         "Battle Roar",
         "Battle Roar End",
         "Battle Dance",
-        //"Clover Ready", // Clover Dancer
-        //"",
-        //"Clover Sub Roar",
-        //"Clover Roar",
-        //"Idle",
-        //"Rest", // Cogwork Dancer
-        //"Windup Ready",
-        //"Windup",
-        //"Emerge",
-        //"Do Roar",
-        //"Sub roar",
-        //"Take Control" // Lace 1
+        "Take Control" // Lace 1
     };
     public static readonly string[] BossParentKeywords = new string[]
     {
