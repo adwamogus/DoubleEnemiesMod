@@ -88,6 +88,8 @@ public class CloneMarker : MonoBehaviour
 
     private bool isSynced = false;
 
+    private string lastLoggedState = "";
+
     public void CopyState(HealthManager original, ManualLogSource logger)
     {
         this.original = original;
@@ -101,7 +103,12 @@ public class CloneMarker : MonoBehaviour
 
         var activeStateName = original.GetComponent<PlayMakerFSM>().Fsm.ActiveStateName;
         GetComponent<PlayMakerFSM>().SetState(activeStateName);
-        logger?.LogInfo($"[{gameObject.name}] Current state: {activeStateName}");
+
+        if (logger != null && activeStateName != lastLoggedState)
+        {
+            logger.LogInfo($"[{gameObject.name}] Current state: {activeStateName}");
+            lastLoggedState = activeStateName;
+        }
 
         bool found = false;
         foreach(var state in StateList.SyncStates)
@@ -123,7 +130,9 @@ public static class StateList
 {
     public static readonly string[] SyncStates = new string[]
     {
-        "Pause",
+        "Pause", // Lost Lace
         "Dormant",
+        "Zoom Down", // Moorwing
+        "Spear Spawn Pause", // Coral Tower Spawn
     };
 }
