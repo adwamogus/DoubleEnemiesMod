@@ -101,7 +101,7 @@ public class CloneMarker : MonoBehaviour
 
         var activeStateName = original.GetComponent<PlayMakerFSM>().Fsm.ActiveStateName;
         GetComponent<PlayMakerFSM>().SetState(activeStateName);
-        logger?.LogInfo(activeStateName);
+        logger?.LogInfo($"[{gameObject.name}] Current state: {activeStateName}");
 
         bool found = false;
         foreach(var state in StateList.SyncStates)
@@ -114,6 +114,7 @@ public class CloneMarker : MonoBehaviour
         if (!found)
         {
             isSynced = true;
+            logger?.LogInfo($"[{gameObject.name}] Stopped syncing: {activeStateName}");
         }
     }
 }
