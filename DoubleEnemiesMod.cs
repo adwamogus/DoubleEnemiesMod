@@ -35,7 +35,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
     }
     [HarmonyPostfix]
     [HarmonyPatch(typeof(HealthManager), "OnEnable")]
-    private static void OnFsmEnabled(HealthManager __instance)
+    private static void OnHealthManagerEnabled(HealthManager __instance)
     {
         if (__instance == null) return;
         TryDuplicateInstance(__instance);
@@ -62,7 +62,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             // Create clone
             var clone = GameObject.Instantiate(
                 healthManager.gameObject,
-                healthManager.transform.position + Vector3.right * 1f,  // leicht verschieben
+                healthManager.transform.position + Vector3.right * 1f, 
                 healthManager.transform.rotation,
                 healthManager.transform.parent
             );
