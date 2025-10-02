@@ -50,7 +50,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
         {
             GameObject gameObject = healthManager.gameObject;
             // Ignore if already a clone
-            if (gameObject.GetComponent<CloneMarker>() != null) return;
+            if (gameObject.GetComponent<CloneMarker>() != null || gameObject.GetComponentInParent<CloneMarker>() != null) return;
 
             // Blacklist check
             foreach (var blocked in Blacklist)
@@ -62,32 +62,47 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                 }
             }
 
-            var parent = gameObject.transform.parent;
-            if (parent != null)
+            var current = gameObject.transform.parent;
+            while (current != null)
             {
-                Log($"[{gameObject.name}] Parent name: {parent.gameObject.name}");
+                string parentName = current.gameObject.name;
+                foreach (var keyword in StringLists.BossParentKeywords) {
+                    if (parentName.Contains(keyword))
+                    {
+                        Log("OMG WUNTERKINT");
+                        CloneObject(current.gameObject);
+                        return;
+                    }
+                }
+                Log($"[{gameObject.name}] Parent name: {parentName}");
+
+                current = current.parent;
             }
 
-            // Mark the original object before cloning
-            gameObject.AddComponent<CloneMarker>();
-
-            // Create clone
-            var clone = GameObject.Instantiate(
-                gameObject,
-                gameObject.transform.position, 
-                gameObject.transform.rotation,
-                gameObject.transform.parent
-            );
-            clone.GetComponent<CloneMarker>().CopyState(gameObject, logger); 
-            // Log clone
-            Log($"[Clone] {gameObject.name} -> {clone.name} in scene {gameObject.gameObject.scene.name}");
+            CloneObject(gameObject);
         }
         catch (Exception ex)
         {
             Log($"[Error] Error while duplicating {healthManager.gameObject?.name}: {ex}");
         }
     }
-    
+    private static void CloneObject(GameObject gameObject)
+    {
+        // Mark the original object before cloning
+        gameObject.AddComponent<CloneMarker>();
+
+        // Create clone
+        var clone = GameObject.Instantiate(
+            gameObject,
+            gameObject.transform.position + Vector3.back * 0.01f,
+            gameObject.transform.rotation,
+            gameObject.transform.parent
+        );
+        clone.GetComponent<CloneMarker>().CopyState(gameObject, logger);
+
+        // Log clone
+        Log($"[Clone] {gameObject.name} -> {clone.name} in scene {gameObject.gameObject.scene.name}");
+    }
 }
 
 // component for clone detection
@@ -124,7 +139,7 @@ public class CloneMarker : MonoBehaviour
         }
 
         bool found = false;
-        foreach(var state in StateList.SyncStates)
+        foreach(var state in StringLists.SyncStates)
         {
             if (state == activeStateName)
             {
@@ -139,7 +154,7 @@ public class CloneMarker : MonoBehaviour
     }
 }
 
-public static class StateList
+public static class StringLists
 {
     public static readonly string[] SyncStates = new string[]
     {
@@ -159,16 +174,22 @@ public static class StateList
         "Battle Roar",
         "Battle Roar End",
         "Battle Dance",
-        "Clover Ready", // Clover Dancer
-        "",
-        "Clover Sub Roar",
-        "Clover Roar",
+        //"Clover Ready", // Clover Dancer
+        //"",
+        //"Clover Sub Roar",
+        //"Clover Roar",
         //"Idle",
-        "Rest", // Cogwork Dancer
-        "Windup Ready",
-        "Windup",
-        "Emerge",
-        "Do Roar",
-        "Sub roar",
+        //"Rest", // Cogwork Dancer
+        //"Windup Ready",
+        //"Windup",
+        //"Emerge",
+        //"Do Roar",
+        //"Sub roar",
+        //"Take Control" // Lace 1
+    };
+    public static readonly string[] BossParentKeywords = new string[]
+    {
+        "Dancer Control",
+        "Boss Scene",
     };
 }
