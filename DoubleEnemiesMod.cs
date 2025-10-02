@@ -13,7 +13,7 @@ using UnityEngine;
 using UnityEngine.Device;
 using UnityEngine.SceneManagement;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "1.0.0")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.2.0")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     private static readonly string[] Blacklist = new string[]
@@ -146,7 +146,11 @@ public static class StateList
         "Burst Out?",
         "Spawn Antic",
         "Spawn",
-        "BG Dance",
+        "BG Dance", // Skarrsinger
         "Challenge Pause",
+        "Battle Roar Antic",
+        "Battle Roar",
+        "Battle Roar End",
+        "Battle Dance",
     };
 }
