@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.Device;
 using UnityEngine.SceneManagement;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.2.0")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.3.0")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
@@ -136,6 +136,7 @@ public class CloneMarker : MonoBehaviour
     public void CopyState(GameObject original)
     {
         this.original = original;
+        //EnsureCollider();
     }
     // Sync loop for enemies who have long intro animations
     private void Update()
@@ -154,7 +155,7 @@ public class CloneMarker : MonoBehaviour
         }
 
         bool found = false;
-        foreach(var state in StringLists.SyncStates)
+        foreach (var state in StringLists.SyncStates)
         {
             if (state == activeStateName)
             {
@@ -167,8 +168,19 @@ public class CloneMarker : MonoBehaviour
             DoubleEnemiesMod.Log($"[{gameObject.name}] Stopped syncing: {activeStateName}");
         }
     }
-}
+    public void EnsureCollider()
+    {
+        var collider = GetComponentInChildren<Collider2D>();
+        if (collider == null)
+        {
+            var circle = gameObject.AddComponent<CircleCollider2D>();
+            circle.isTrigger = false;
+            circle.radius = 1f;
 
+            DoubleEnemiesMod.Log($"[{gameObject.name}] No collider found -> CircleCollider2D added");
+        }
+    }
+}
 public static class StringLists
 {
     public static readonly string[] Blacklist = new string[]
