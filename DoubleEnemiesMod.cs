@@ -85,7 +85,8 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                 Log($"[{gameObject.name}] Parent name: {parentName}");
                 foreach (var keyword in StringLists.BossParentKeywords) {
                     // Special Treatment for Lace 2 because she bricks the game if we clone the boss scene
-                    if (parentName.Contains(keyword) && !gameObject.name.Contains("Lace Boss2 New"))
+                    // Same for Grandmother silk because she is scuffed af without it
+                    if (parentName.Contains(keyword) && !gameObject.name.Contains("Lace Boss2 New") && !gameObject.name.Contains("Silk Boss"))
                     {
                         if (current.GetComponent<CloneMarker>() == null)
                         {
@@ -223,6 +224,8 @@ public static class StringLists
         "Battle Roar End",
         "Battle Dance",
         "Take Control", // Lace 1
+        "Init", // Grandmother
+        "Ready",
     };
     public static readonly string[] BossParentKeywords = new string[]
     {
