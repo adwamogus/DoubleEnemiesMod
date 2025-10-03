@@ -85,7 +85,14 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                 foreach (var keyword in StringLists.BossParentKeywords) {
                     if (parentName.Contains(keyword))
                     {
-                        CloneObject(current.gameObject);
+                        if (current.GetComponent<CloneMarker>() != null)
+                        {
+                            CloneObject(current.gameObject);
+                        }
+                        else
+                        {
+                            Log($"[{gameObject.name}] Parent was already cloned");
+                        }
                         return;
                     }
                 }
@@ -106,7 +113,6 @@ public class DoubleEnemiesMod : BaseUnityPlugin
         // Mark the original object before cloning
         gameObject.AddComponent<CloneMarker>();
 
-        Log($"{Multiplier.Value}");
         for(int i = 0; i < Multiplier.Value - 1; i++)
         {
             // Create clone
@@ -116,6 +122,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                 gameObject.transform.rotation,
                 gameObject.transform.parent
             );
+            clone.name += "DECLONE";
             clone.GetComponent<CloneMarker>().CopyState(gameObject);
 
             // Log clone
@@ -136,17 +143,21 @@ public class CloneMarker : MonoBehaviour
     public void CopyState(GameObject original)
     {
         this.original = original;
-        //EnsureCollider();
     }
     // Sync loop for enemies who have long intro animations
-    private void Update()
+    private void LateUpdate()
     {
         if (isSynced || original == null) return;
 
         //Sync
-        var activeStateName = original.GetComponent<PlayMakerFSM>().Fsm.ActiveStateName;
-        GetComponent<PlayMakerFSM>().SetState(activeStateName);
+        var activeStateName = original.GetComponent<PlayMakerFSM>()?.Fsm.ActiveStateName;
+        GetComponent<PlayMakerFSM>()?.SetState(activeStateName);
         transform.position = original.transform.position;
+
+        if(activeStateName == null)
+        {
+            return;
+        }
 
         if (activeStateName != lastLoggedState)
         {
@@ -165,12 +176,17 @@ public class CloneMarker : MonoBehaviour
         if (!found)
         {
             isSynced = true;
+            EnsureCollider();
             DoubleEnemiesMod.Log($"[{gameObject.name}] Stopped syncing: {activeStateName}");
         }
     }
     public void EnsureCollider()
     {
-        var collider = GetComponentInChildren<Collider2D>();
+        var collider = GetComponent<Collider2D>();
+        if (collider == null)
+        {
+            collider = GetComponentInChildren<Collider2D>();
+        }
         if (collider == null)
         {
             var circle = gameObject.AddComponent<CircleCollider2D>();
@@ -206,7 +222,11 @@ public static class StringLists
         "Battle Roar",
         "Battle Roar End",
         "Battle Dance",
-        "Take Control" // Lace 1
+        "Take Control", // Lace 1
+        "Ambush Antic", // High Halls Arena
+        "Enter Leap 2",
+        "Enter Fall",
+        "",
     };
     public static readonly string[] BossParentKeywords = new string[]
     {
