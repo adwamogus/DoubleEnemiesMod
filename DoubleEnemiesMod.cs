@@ -84,7 +84,8 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                 string parentName = current.gameObject.name;
                 Log($"[{gameObject.name}] Parent name: {parentName}");
                 foreach (var keyword in StringLists.BossParentKeywords) {
-                    if (parentName.Contains(keyword))
+                    // Special Treatment for Lace 2 because she bricks the game if we clone the boss scene
+                    if (parentName.Contains(keyword) && !gameObject.name.Contains("Lace Boss2 New"))
                     {
                         if (current.GetComponent<CloneMarker>() == null)
                         {
