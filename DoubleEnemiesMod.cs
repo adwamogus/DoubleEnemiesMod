@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.Device;
 using UnityEngine.SceneManagement;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.3.0")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.4.0")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
@@ -227,6 +227,7 @@ public static class StringLists
 {
     public static readonly string[] Blacklist = new string[]
     {
+        "Crystal Drifter",
     };
     public static readonly string[] SyncStates = new string[]
     {
@@ -255,5 +256,6 @@ public static class StringLists
         "Dancer Control",
         "Boss Scene",
         "Battle Scene",
+        "Muckmen Control"
     };
 }
