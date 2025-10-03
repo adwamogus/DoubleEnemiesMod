@@ -82,10 +82,11 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             while (current != null)
             {
                 string parentName = current.gameObject.name;
+                Log($"[{gameObject.name}] Parent name: {parentName}");
                 foreach (var keyword in StringLists.BossParentKeywords) {
                     if (parentName.Contains(keyword))
                     {
-                        if (current.GetComponent<CloneMarker>() != null)
+                        if (current.GetComponent<CloneMarker>() == null)
                         {
                             CloneObject(current.gameObject);
                         }
@@ -96,8 +97,6 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                         return;
                     }
                 }
-                Log($"[{gameObject.name}] Parent name: {parentName}");
-
                 current = current.parent;
             }
 
@@ -223,14 +222,11 @@ public static class StringLists
         "Battle Roar End",
         "Battle Dance",
         "Take Control", // Lace 1
-        "Ambush Antic", // High Halls Arena
-        "Enter Leap 2",
-        "Enter Fall",
-        "",
     };
     public static readonly string[] BossParentKeywords = new string[]
     {
         "Dancer Control",
         "Boss Scene",
+        "Battle Scene",
     };
 }
