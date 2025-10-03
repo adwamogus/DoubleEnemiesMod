@@ -137,6 +137,9 @@ public class CloneMarker : MonoBehaviour
 {
     private GameObject original;
 
+    private BattleScene originalBattleScene;
+    private BattleScene cloneBattleScene;
+
     private bool isSynced = false;
 
     private string lastLoggedState = "";
@@ -144,8 +147,30 @@ public class CloneMarker : MonoBehaviour
     public void CopyState(GameObject original)
     {
         this.original = original;
+
+        // Coral Tower Arena fix
+        // yeah this code is messy but Coral tower is annoying
+        originalBattleScene = this.original.GetComponent<BattleScene>();
+        if (originalBattleScene == null) 
+        {
+            originalBattleScene = this.original.GetComponentInChildren<BattleScene>();
+        }
+        if (originalBattleScene != null)
+        {
+            DoubleEnemiesMod.Log($"BattleScene component found in {originalBattleScene.gameObject.name}");
+            cloneBattleScene = GetComponent<BattleScene>();
+            if (cloneBattleScene == null)
+            {
+                cloneBattleScene = GetComponentInChildren<BattleScene>();
+            }
+
+            if (gameObject.scene.name.Contains("Memory_Coral_Tower"))
+            {
+                DoubleEnemiesMod.Log("Coral Tower detected");
+                cloneBattleScene.StartBattle();
+            }
+        }
     }
-    // Sync loop for enemies who have long intro animations
     private void LateUpdate()
     {
         if (isSynced || original == null) return;
@@ -177,7 +202,7 @@ public class CloneMarker : MonoBehaviour
         if (!found)
         {
             isSynced = true;
-            EnsureCollider();
+            //EnsureCollider();
             DoubleEnemiesMod.Log($"[{gameObject.name}] Stopped syncing: {activeStateName}");
         }
     }
@@ -202,8 +227,6 @@ public static class StringLists
 {
     public static readonly string[] Blacklist = new string[]
     {
-        "Coral Warrior",
-        "Coral Flyer",
     };
     public static readonly string[] SyncStates = new string[]
     {
