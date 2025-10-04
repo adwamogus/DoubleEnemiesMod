@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.Device;
 using UnityEngine.SceneManagement;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.4.1")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.4.2")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
@@ -218,11 +218,18 @@ public class CloneMarker : MonoBehaviour
 
     private bool isSynced = false;
 
+    private bool isSongGolem = false;
+
     private string lastLoggedState = "";
 
     public void CopyState(GameObject original)
     {
         this.original = original;
+
+        if (original.name.Contains("song_golem"))
+        {
+            isSongGolem = true;
+        }
 
         // Coral Tower Arena fix
         // yeah this code is messy but Coral tower is annoying
@@ -249,6 +256,18 @@ public class CloneMarker : MonoBehaviour
     }
     private void LateUpdate()
     {
+        //Song Golem special treatment
+        if (isSongGolem)
+        {
+            if (original.GetComponent<PlayMakerFSM>()?.Fsm.ActiveStateName == "Summon 2")
+            {
+                DoubleEnemiesMod.Log($"[{gameObject.name}] destroy song golem");
+                Destroy(gameObject);
+                return;
+            }
+
+        }
+
         if (isSynced || original == null) return;
 
         //Sync
@@ -298,6 +317,37 @@ public class CloneMarker : MonoBehaviour
             DoubleEnemiesMod.Log($"[{gameObject.name}] No collider found -> CircleCollider2D added");
         }
     }
+
+    private void LogAllComponents()
+    {
+        DoubleEnemiesMod.Log($"--- Components on {gameObject.name} ---");
+
+        Component[] components = gameObject.GetComponents<Component>();
+
+        foreach (Component comp in components)
+        {
+            if (comp != null)
+                DoubleEnemiesMod.Log(comp.GetType().Name);
+            else
+                DoubleEnemiesMod.Log("Missing (null) Component found!");
+        }
+
+        foreach (Transform child in transform)
+        {
+            DoubleEnemiesMod.Log($"[{gameObject.name}] has child: {child.gameObject.name}");
+            components = child.GetComponents<Component>();
+
+            DoubleEnemiesMod.Log($"--- Components on {child.name} ---");
+
+            foreach (Component comp in components)
+            {
+                if (comp != null)
+                    DoubleEnemiesMod.Log(comp.GetType().Name);
+                else
+                    DoubleEnemiesMod.Log("Missing (null) Component found!");
+            }
+        }
+    }
 }
 public static class StringLists
 {
@@ -326,13 +376,15 @@ public static class StringLists
         "Take Control", // Lace 1
         "Init", // Grandmother
         "Ready",
+        "Wall", // Flint bug
     };
     public static readonly string[] ParentKeywords = new string[]
     {
         "Dancer Control",
         "Boss Scene",
         "Battle Scene",
-        "Muckmen Control"
+        "Muckmen Control",
+        "song_golem"
     };
     public static readonly string[] BossFilterKeywords = new string[]
     {
@@ -340,7 +392,8 @@ public static class StringLists
         "Boss Scene",
         "Silk Boss",
         "Lace Boss2 New",
-        "Splinter Queen"
+        "Splinter Queen",
+        "song_golem"
     };
     public static readonly string[] ArenaFilterKeywords = new string[]
     {
