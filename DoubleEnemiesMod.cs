@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.Device;
 using UnityEngine.SceneManagement;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.4.2")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.4.3")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
@@ -112,7 +112,11 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                     // Special Treatment for Lace 2 because she bricks the game if we clone the boss scene
                     // Same for Grandmother silk because she is scuffed af without it
                     // Sister Splinter too?
-                    if (parentName.Contains(keyword) && !gameObject.name.Contains("Lace Boss2 New") && !gameObject.name.Contains("Silk Boss") && !gameObject.scene.name.Contains("Shellwood_18"))
+                    // First Weaver
+                    if (parentName.Contains(keyword) && !gameObject.name.Contains("Lace Boss2 New") &&
+                        !gameObject.name.Contains("Silk Boss") &&
+                        !gameObject.scene.name.Contains("Shellwood_18") &&
+                        !gameObject.name.Contains("First Weaver"))
                     {
                         if (current.GetComponent<CloneMarker>() == null)
                         {
