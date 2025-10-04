@@ -393,7 +393,8 @@ public static class StringLists
         "Silk Boss",
         "Lace Boss2 New",
         "Splinter Queen",
-        "song_golem"
+        "song_golem",
+        "Vampire Gnat Boss",
     };
     public static readonly string[] ArenaFilterKeywords = new string[]
     {
