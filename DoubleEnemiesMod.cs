@@ -14,12 +14,16 @@ using UnityEngine;
 using UnityEngine.Device;
 using UnityEngine.SceneManagement;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.4.0")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.4.1")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
 
     public static ConfigEntry<bool> debugLog;
+
+    public static ConfigEntry<bool> EnableEnemies;
+    public static ConfigEntry<bool> EnableArenas;
+    public static ConfigEntry<bool> EnableBosses;
 
     private static ManualLogSource logger;
     private void Awake()
@@ -38,6 +42,27 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             "DebugLog",
             false,
             "For development"
+            );
+
+        EnableEnemies = Config.Bind(
+            "Control",
+            "Enable Enemies",
+            true,
+            "Enables cloning of all normal enemies"
+            );
+
+        EnableArenas = Config.Bind(
+            "Control",
+            "Enable Arenas",
+            true,
+            "Enables cloning of all arenas"
+            );
+
+        EnableBosses = Config.Bind(
+            "Control",
+            "Enable Bosses",
+            true,
+            "Enables cloning of all bosses"
             );
 
         Log("Double Enemies Mod loaded");
@@ -71,7 +96,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             // Blacklist check
             foreach (var blocked in StringLists.Blacklist)
             {
-                if (gameObject.name.Contains(blocked) || gameObject.name.Contains(blocked))
+                if (gameObject.name.Contains(blocked))
                 {
                     Log($"[Blacklist] Skipped: {gameObject.name} ({gameObject.name}) in scene {gameObject.scene.name}");
                     return;
@@ -83,10 +108,11 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             {
                 string parentName = current.gameObject.name;
                 Log($"[{gameObject.name}] Parent name: {parentName}");
-                foreach (var keyword in StringLists.BossParentKeywords) {
+                foreach (var keyword in StringLists.ParentKeywords) {
                     // Special Treatment for Lace 2 because she bricks the game if we clone the boss scene
                     // Same for Grandmother silk because she is scuffed af without it
-                    if (parentName.Contains(keyword) && !gameObject.name.Contains("Lace Boss2 New") && !gameObject.name.Contains("Silk Boss"))
+                    // Sister Splinter too?
+                    if (parentName.Contains(keyword) && !gameObject.name.Contains("Lace Boss2 New") && !gameObject.name.Contains("Silk Boss") && !gameObject.name.Contains("Splinter Queen Spike"))
                     {
                         if (current.GetComponent<CloneMarker>() == null)
                         {
@@ -111,6 +137,11 @@ public class DoubleEnemiesMod : BaseUnityPlugin
     }
     private static void CloneObject(GameObject gameObject)
     {
+        if (!CheckEnemyType(gameObject.name))
+        {
+            return;
+        }
+
         // Mark the original object before cloning
         gameObject.AddComponent<CloneMarker>();
 
@@ -130,6 +161,51 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             Log($"[Clone] {gameObject.name} -> {clone.name} in scene {gameObject.gameObject.scene.name}");
         }
     }
+    private static bool CheckEnemyType(string gameObjectName)
+    {
+        // Arena Check
+        foreach (var keyword in StringLists.ArenaFilterKeywords)
+        {
+            if (gameObjectName.Contains(keyword))
+            {
+                if (EnableArenas.Value)
+                {
+                    return true;
+                }
+                else
+                {
+                    Log($"[{gameObjectName}] was not cloned due to config settings (Arena)");
+                    return false;
+                }
+            }
+        }
+        // Boss Check
+        foreach (var keyword in StringLists.BossFilterKeywords)
+        {
+            if (gameObjectName.Contains(keyword))
+            {
+                if (EnableBosses.Value)
+                {
+                    return true;
+                }
+                else
+                {
+                    Log($"[{gameObjectName}] was not cloned due to config settings (Boss)");
+                    return false;
+                }
+            }
+        }
+        // Enemy Check
+        if (EnableEnemies.Value)
+        {
+            return true;
+        }
+        else
+        {
+            Log($"[{gameObjectName}] was not cloned due to config settings (Enemy)");
+            return false;
+        }
+    } 
 }
 
 // component for clone detection
@@ -251,11 +327,22 @@ public static class StringLists
         "Init", // Grandmother
         "Ready",
     };
-    public static readonly string[] BossParentKeywords = new string[]
+    public static readonly string[] ParentKeywords = new string[]
     {
         "Dancer Control",
         "Boss Scene",
         "Battle Scene",
         "Muckmen Control"
+    };
+    public static readonly string[] BossFilterKeywords = new string[]
+    {
+        "Dancer Control",
+        "Boss Scene",
+        "Silk Boss",
+        "Lace Boss2 New"
+    };
+    public static readonly string[] ArenaFilterKeywords = new string[]
+    {
+        "Battle Scene"
     };
 }
