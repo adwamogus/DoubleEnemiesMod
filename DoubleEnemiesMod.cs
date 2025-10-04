@@ -112,7 +112,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                     // Special Treatment for Lace 2 because she bricks the game if we clone the boss scene
                     // Same for Grandmother silk because she is scuffed af without it
                     // Sister Splinter too?
-                    if (parentName.Contains(keyword) && !gameObject.name.Contains("Lace Boss2 New") && !gameObject.name.Contains("Silk Boss") && !gameObject.name.Contains("Splinter Queen Spike"))
+                    if (parentName.Contains(keyword) && !gameObject.name.Contains("Lace Boss2 New") && !gameObject.name.Contains("Silk Boss") && !gameObject.scene.name.Contains("Shellwood_18"))
                     {
                         if (current.GetComponent<CloneMarker>() == null)
                         {
@@ -339,7 +339,8 @@ public static class StringLists
         "Dancer Control",
         "Boss Scene",
         "Silk Boss",
-        "Lace Boss2 New"
+        "Lace Boss2 New",
+        "Splinter Queen"
     };
     public static readonly string[] ArenaFilterKeywords = new string[]
     {
