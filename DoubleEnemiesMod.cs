@@ -399,6 +399,7 @@ public static class StringLists
         "Splinter Queen",
         "song_golem",
         "Vampire Gnat Boss",
+        "First Weaver",
     };
     public static readonly string[] ArenaFilterKeywords = new string[]
     {
