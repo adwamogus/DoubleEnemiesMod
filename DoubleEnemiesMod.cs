@@ -65,7 +65,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             "Enables cloning of all bosses"
             );
 
-        Log("Double Enemies Mod loaded");
+        Logger.LogInfo("Double Enemies Mod loaded");
         Harmony.CreateAndPatchAll(typeof(DoubleEnemiesMod));
     }
     public static void Log(string msg)
