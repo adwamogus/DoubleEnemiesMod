@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.Device;
 using UnityEngine.SceneManagement;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.4.3")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.4.4")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
@@ -222,8 +222,6 @@ public class CloneMarker : MonoBehaviour
 
     private bool isSynced = false;
 
-    private bool isSongGolem = false;
-
     private string lastLoggedState = "";
 
     public void CopyState(GameObject original)
@@ -232,9 +230,16 @@ public class CloneMarker : MonoBehaviour
 
         if (original.name.Contains("song_golem"))
         {
-            isSongGolem = true;
+            foreach (var heroDamager in Resources.FindObjectsOfTypeAll<DamageHero>())
+            {
+                if (heroDamager.gameObject.name == "Lava Rock Damager")
+                {
+                    UnityEngine.Object.DestroyImmediate(heroDamager);
+                    DoubleEnemiesMod.Log("Destroyed Rock Damager");
+                }
+            }
         }
-
+           
         // Coral Tower Arena fix
         // yeah this code is messy but Coral tower is annoying
         originalBattleScene = this.original.GetComponent<BattleScene>();
@@ -260,18 +265,6 @@ public class CloneMarker : MonoBehaviour
     }
     private void LateUpdate()
     {
-        //Song Golem special treatment
-        if (isSongGolem)
-        {
-            if (original.GetComponent<PlayMakerFSM>()?.Fsm.ActiveStateName == "Summon 2")
-            {
-                DoubleEnemiesMod.Log($"[{gameObject.name}] destroy song golem");
-                Destroy(gameObject);
-                return;
-            }
-
-        }
-
         if (isSynced || original == null) return;
 
         //Sync
@@ -351,6 +344,17 @@ public class CloneMarker : MonoBehaviour
                     DoubleEnemiesMod.Log("Missing (null) Component found!");
             }
         }
+    }
+    private static string GetFullPath(GameObject obj)
+    {
+        string path = obj.name;
+        Transform current = obj.transform.parent;
+        while (current != null)
+        {
+            path = current.name + "/" + path;
+            current = current.parent;
+        }
+        return path;
     }
 }
 public static class StringLists
