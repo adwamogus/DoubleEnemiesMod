@@ -103,20 +103,14 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                 }
             }
 
-            var current = gameObject.transform.parent;
+            var current = gameObject.transform;
             while (current != null)
             {
                 string parentName = current.gameObject.name;
                 Log($"[{gameObject.name}] Parent name: {parentName}");
                 foreach (var keyword in StringLists.ParentKeywords) {
-                    // Special Treatment for Lace 2 because she bricks the game if we clone the boss scene
-                    // Same for Grandmother silk because she is scuffed af without it
-                    // Sister Splinter too?
-                    // First Weaver
-                    if (parentName.Contains(keyword) && !gameObject.name.Contains("Lace Boss2 New") &&
-                        !gameObject.name.Contains("Silk Boss") &&
-                        !gameObject.scene.name.Contains("Shellwood_18") &&
-                        !gameObject.name.Contains("First Weaver"))
+                    // sister splinter arena funny moment
+                    if (parentName.Contains(keyword) && !gameObject.scene.name.Contains("Shellwood_18"))
                     {
                         if (current.GetComponent<CloneMarker>() == null)
                         {
@@ -392,18 +386,23 @@ public static class StringLists
         "Boss Scene",
         "Battle Scene",
         "Muckmen Control",
-        "song_golem"
+        "song_golem",
+        "First Weaver",
+        "First Weaver",
+        "Silk Boss",
+        "Lace Boss2 New",
     };
     public static readonly string[] BossFilterKeywords = new string[]
     {
         "Dancer Control",
         "Boss Scene",
-        "Silk Boss",
-        "Lace Boss2 New",
         "Splinter Queen",
         "song_golem",
         "Vampire Gnat Boss",
         "First Weaver",
+        "First Weaver",
+        "Silk Boss",
+        "Lace Boss2 New",
     };
     public static readonly string[] ArenaFilterKeywords = new string[]
     {
