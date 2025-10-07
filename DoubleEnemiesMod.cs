@@ -7,7 +7,7 @@ using HutongGames.PlayMaker.Actions;
 using System;
 using UnityEngine;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.5.0")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.5.1")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
@@ -105,27 +105,41 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                 }
             }
 
-            var current = gameObject.transform;
-            while (current != null)
+            bool isSceneValid = true;
+            foreach (var blocked in StringLists.BlacklistedScenes)
             {
-                string parentName = current.gameObject.name;
-                Log($"[{gameObject.name}] Parent name: {parentName}");
-                foreach (var keyword in StringLists.ParentKeywords) {
-                    // sister splinter arena funny moment
-                    if (parentName.Contains(keyword) && !gameObject.scene.name.Contains("Shellwood_18"))
-                    {
-                        if (current.GetComponent<CloneMarker>() == null)
-                        {
-                            CloneObject(current.gameObject, healthManager);
-                        }
-                        else
-                        {
-                            Log($"[{gameObject.name}] Parent was already cloned");
-                        }
-                        return;
-                    }
+                if (gameObject.scene.name.Contains(blocked))
+                {
+                    isSceneValid = false;
+                    Log($"[Blacklist] {gameObject.name} is in a blacklisted scene. Skipping parent scans");
                 }
-                current = current.parent;
+            }
+
+            if (isSceneValid)
+            {
+                var current = gameObject.transform;
+                while (current != null)
+                {
+                    string parentName = current.gameObject.name;
+                    Log($"[{gameObject.name}] Parent name: {parentName}");
+                    foreach (var keyword in StringLists.ParentKeywords)
+                    {
+
+                        if (parentName.Contains(keyword))
+                        {
+                            if (current.GetComponent<CloneMarker>() == null)
+                            {
+                                CloneObject(current.gameObject, healthManager);
+                            }
+                            else
+                            {
+                                Log($"[{gameObject.name}] Parent was already cloned");
+                            }
+                            return;
+                        }
+                    }
+                    current = current.parent;
+                }
             }
 
             CloneObject(gameObject, healthManager);

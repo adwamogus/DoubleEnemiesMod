@@ -4,6 +4,11 @@
     {
         "Crystal Drifter",
     };
+    public static readonly string[] BlacklistedScenes = new string[]
+    {
+        "Shellwood_18",
+        "Shadow_18",
+    };
     public static readonly string[] SyncStates = new string[]
     {
         "Pause", // Lost Lace
@@ -38,6 +43,7 @@
         "First Weaver",
         "Silk Boss",
         "Lace Boss2 New",
+        "Swamp Shaman",
     };
     public static readonly string[] BossFilterKeywords = new string[]
     {
@@ -50,6 +56,7 @@
         "First Weaver",
         "Silk Boss",
         "Lace Boss2 New",
+        "Swamp Shaman",
     };
     public static readonly string[] ArenaFilterKeywords = new string[]
     {
