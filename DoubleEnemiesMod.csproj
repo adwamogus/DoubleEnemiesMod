@@ -158,7 +158,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CloneMarker.cs" />
     <Compile Include="DoubleEnemiesMod.cs" />
+    <Compile Include="Extras.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
