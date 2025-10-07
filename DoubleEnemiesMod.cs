@@ -144,7 +144,8 @@ public class DoubleEnemiesMod : BaseUnityPlugin
 
         bool isSharedHPEnabled = false;
         // Grand Mother Silk doesn't work due to extra healthbars
-        if (EnableSharedHP.Value && GetEnemyType(gameObject.name) == EnemyType.Boss && gameObject.name != "Silk Boss")
+        // Dancers don't work because there are two original HealthManager
+        if (EnableSharedHP.Value && GetEnemyType(gameObject.name) == EnemyType.Boss && gameObject.name != "Silk Boss" && gameObject.name != "Dancer Control")
         {
             isSharedHPEnabled = true;
             healthManager.hp = healthManager.hp * Multiplier.Value;
