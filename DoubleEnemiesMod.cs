@@ -116,7 +116,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                     {
                         if (current.GetComponent<CloneMarker>() == null)
                         {
-                            CloneObject(current.gameObject);
+                            CloneObject(current.gameObject, healthManager);
                         }
                         else
                         {
@@ -128,22 +128,31 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                 current = current.parent;
             }
 
-            CloneObject(gameObject);
+            CloneObject(gameObject, healthManager);
         }
         catch (Exception ex)
         {
             Log($"[Error] Error while duplicating {healthManager.gameObject?.name}: {ex}");
         }
     }
-    private static void CloneObject(GameObject gameObject)
+    private static void CloneObject(GameObject gameObject, HealthManager healthManager)
     {
         if (!CheckEnemyEnabled(gameObject.name))
         {
             return;
         }
 
+        bool isSharedHPEnabled = false;
+        if (EnableSharedHP.Value && GetEnemyType(gameObject.name) == EnemyType.Boss)
+        {
+            isSharedHPEnabled = true;
+            healthManager.hp = healthManager.hp * Multiplier.Value;
+            Log($"[SharedHP] Increased HP of {gameObject.name} to: {healthManager.hp}");
+        }
+
         // Mark the original object before cloning
-        gameObject.AddComponent<CloneMarker>();
+        CloneMarker originalCloneMarker = gameObject.AddComponent<CloneMarker>();
+        originalCloneMarker.isSharedHPEnabled = isSharedHPEnabled;
 
         for(int i = 0; i < Multiplier.Value - 1; i++)
         {
@@ -155,7 +164,9 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                 gameObject.transform.parent
             );
             clone.name += "DECLONE";
-            clone.GetComponent<CloneMarker>().CopyState(gameObject);
+            CloneMarker cloneMarker = clone.GetComponent<CloneMarker>();
+            cloneMarker.isSharedHPEnabled = isSharedHPEnabled;
+            cloneMarker.CopyState(gameObject, healthManager);
 
             // Log clone
             Log($"[Clone] {gameObject.name} -> {clone.name} in scene {gameObject.gameObject.scene.name}");
@@ -200,7 +211,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
         Log("$[{gameObjectName}] Invalid enemy type exception");
         return false;
     }
-    private static EnemyType GetEnemyType(string gameObjectName)
+    public static EnemyType GetEnemyType(string gameObjectName)
     {
         // Arena Check
         foreach (var keyword in StringLists.ArenaFilterKeywords)

@@ -7,30 +7,48 @@ using HutongGames.PlayMaker.Actions;
 using System;
 using UnityEngine;
 
-// component for clone detection
 public class CloneMarker : MonoBehaviour
 {
     private GameObject original;
+
+    private HealthManager originalHealth;
+    private HealthManager cloneHealth;
 
     private BattleScene originalBattleScene;
     private BattleScene cloneBattleScene;
 
     private bool isSynced = false;
+    private bool isClone = false;
+
+    public bool isSharedHPEnabled;
 
     private string lastLoggedState = "";
 
-    public void CopyState(GameObject original)
+    public void CopyState(GameObject original, HealthManager healthManager)
     {
         this.original = original;
+        this.originalHealth = healthManager;
+        isClone = true;
 
         SongGolemFix();
 
         CoralTowerFix();
 
+        if (isSharedHPEnabled)
+        {
+            cloneHealth = GetComponent<HealthManager>();
+            if(cloneHealth == null)
+            {
+                cloneHealth = GetComponentInChildren<HealthManager>();
+            }
+
+            originalHealth.TookDamage += CloneSharedHPUpdate;
+            cloneHealth.TookDamage += CloneSharedHPUpdate;
+        }
     }
     private void LateUpdate()
     {
-        if (isSynced || original == null) return;
+        if (isSynced || !isClone) return;
 
         //Sync
         var activeStateName = original.GetComponent<PlayMakerFSM>()?.Fsm.ActiveStateName;
@@ -99,6 +117,23 @@ public class CloneMarker : MonoBehaviour
                 DoubleEnemiesMod.Log("Coral Tower detected");
                 cloneBattleScene.StartBattle();
             }
+        }
+    }
+    private void CloneSharedHPUpdate()
+    {
+        // Check if Clone has taken more damage
+        if (originalHealth.hp > cloneHealth.hp)
+        {
+            int delta = originalHealth.hp - cloneHealth.hp;
+            DoubleEnemiesMod.Log($"SHP[{gameObject.name}/{cloneHealth.hp}] Apply {delta} to SHP[{original.gameObject.name}/{originalHealth.hp}]");
+            originalHealth.ApplyExtraDamage(delta);
+        }
+        // Check if original has taken more damage
+        else if (cloneHealth.hp > originalHealth.hp)
+        {
+            int delta = cloneHealth.hp - originalHealth.hp;
+            DoubleEnemiesMod.Log($"SHP[{gameObject.name}/{cloneHealth.hp}] Take {delta} from SHP[{original.gameObject.name}/{originalHealth.hp}]");
+            cloneHealth.ApplyExtraDamage(delta);
         }
     }
 
