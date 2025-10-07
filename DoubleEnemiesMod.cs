@@ -7,7 +7,7 @@ using HutongGames.PlayMaker.Actions;
 using System;
 using UnityEngine;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.4.5")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.5.0")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
@@ -143,7 +143,8 @@ public class DoubleEnemiesMod : BaseUnityPlugin
         }
 
         bool isSharedHPEnabled = false;
-        if (EnableSharedHP.Value && GetEnemyType(gameObject.name) == EnemyType.Boss)
+        // Grand Mother Silk doesn't work due to extra healthbars
+        if (EnableSharedHP.Value && GetEnemyType(gameObject.name) == EnemyType.Boss && gameObject.name != "Silk Boss")
         {
             isSharedHPEnabled = true;
             healthManager.hp = healthManager.hp * Multiplier.Value;
