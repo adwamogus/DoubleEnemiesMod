@@ -87,6 +87,24 @@ public class DoubleEnemiesMod : BaseUnityPlugin
         if (__instance == null) return;
         TryDuplicateInstance(__instance);
     }
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(BattleScene), "StartBattle")]
+    private static void OnBattleStart(BattleScene __instance)
+    {
+        var marker = __instance.GetComponent<CloneMarker>();
+        if (marker != null)
+        {
+            if (marker.StartBattle != null)
+            {
+                marker.StartBattle.Invoke();
+                DoubleEnemiesMod.Log("[BattleScenePatcher] Started CloneScene");
+            }
+            else
+            {
+                DoubleEnemiesMod.Log("[BattleScenePatcher] No StartBattle subscribers on marker");
+            }
+        }
+    }
     private static void TryDuplicateInstance(HealthManager healthManager)
     {
         try
@@ -248,4 +266,14 @@ public class DoubleEnemiesMod : BaseUnityPlugin
         // Enemy Check
         return EnemyType.Enemy;
     } 
+}
+
+[HarmonyPatch(typeof(BattleScene))]
+[HarmonyPatch("StartBattle")]
+public static class Patch_BattleScene_StartBattle
+{
+    public static void Postfix(BattleScene __instance)
+    {
+        
+    }
 }

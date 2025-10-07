@@ -17,6 +17,8 @@ public class CloneMarker : MonoBehaviour
     private BattleScene originalBattleScene;
     private BattleScene cloneBattleScene;
 
+    public Action StartBattle;
+
     private bool isSynced = false;
     private bool isClone = false;
 
@@ -32,7 +34,7 @@ public class CloneMarker : MonoBehaviour
 
         SongGolemFix();
 
-        CoralTowerFix();
+        BattleSceneFix();
 
         if (isSharedHPEnabled)
         {
@@ -91,6 +93,32 @@ public class CloneMarker : MonoBehaviour
                     UnityEngine.Object.DestroyImmediate(heroDamager);
                     DoubleEnemiesMod.Log("Destroyed Rock Damager");
                 }
+            }
+        }
+    }
+    private void BattleSceneFix()
+    {
+        cloneBattleScene = GetComponent<BattleScene>();
+        if (cloneBattleScene != null)
+        {
+            if (gameObject.scene.name.Contains("Memory_Coral_Tower"))
+            {
+                DoubleEnemiesMod.Log("Coral Tower detected");
+                cloneBattleScene.StartBattle();
+            }
+            else
+            {
+                CloneMarker marker = original.GetComponent<CloneMarker>();
+                if (marker != null)
+                {
+                    marker.StartBattle += cloneBattleScene.StartBattle;
+                    DoubleEnemiesMod.Log("Connected to original BattleScene");
+                }
+                else
+                {
+                    DoubleEnemiesMod.Log("original BattleScene hase no marker");
+                }
+                
             }
         }
     }

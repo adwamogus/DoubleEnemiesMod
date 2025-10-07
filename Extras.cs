@@ -8,6 +8,7 @@
     {
         "Shellwood_18",
         "Shadow_18",
+        "Dust_Chef",
     };
     public static readonly string[] SyncStates = new string[]
     {
@@ -31,6 +32,12 @@
         "Init", // Grandmother
         "Ready",
         "Wall", // Flint bug
+        "Intro Pause", // Voltvyrm
+        "Intro Antic",
+        "Roar",
+        "Dissapear 1",
+        "Dissapear 2",
+        "Ambush Ready",
     };
     public static readonly string[] ParentKeywords = new string[]
     {
@@ -43,7 +50,7 @@
         "First Weaver",
         "Silk Boss",
         "Lace Boss2 New",
-        "Swamp Shaman",
+        "Zap Core Enemy",
     };
     public static readonly string[] BossFilterKeywords = new string[]
     {
@@ -57,6 +64,8 @@
         "Silk Boss",
         "Lace Boss2 New",
         "Swamp Shaman",
+        "Roachkeeper Chef",
+        "Zap Core Enemy",
     };
     public static readonly string[] ArenaFilterKeywords = new string[]
     {
