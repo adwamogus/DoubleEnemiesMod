@@ -23,40 +23,10 @@ public class CloneMarker : MonoBehaviour
     {
         this.original = original;
 
-        if (original.name.Contains("song_golem"))
-        {
-            foreach (var heroDamager in Resources.FindObjectsOfTypeAll<DamageHero>())
-            {
-                if (heroDamager.gameObject.name == "Lava Rock Damager")
-                {
-                    UnityEngine.Object.DestroyImmediate(heroDamager);
-                    DoubleEnemiesMod.Log("Destroyed Rock Damager");
-                }
-            }
-        }
+        SongGolemFix();
 
-        // Coral Tower Arena fix
-        // yeah this code is messy but Coral tower is annoying
-        originalBattleScene = this.original.GetComponent<BattleScene>();
-        if (originalBattleScene == null)
-        {
-            originalBattleScene = this.original.GetComponentInChildren<BattleScene>();
-        }
-        if (originalBattleScene != null)
-        {
-            DoubleEnemiesMod.Log($"BattleScene component found in {originalBattleScene.gameObject.name}");
-            cloneBattleScene = GetComponent<BattleScene>();
-            if (cloneBattleScene == null)
-            {
-                cloneBattleScene = GetComponentInChildren<BattleScene>();
-            }
+        CoralTowerFix();
 
-            if (gameObject.scene.name.Contains("Memory_Coral_Tower"))
-            {
-                DoubleEnemiesMod.Log("Coral Tower detected");
-                cloneBattleScene.StartBattle();
-            }
-        }
     }
     private void LateUpdate()
     {
@@ -89,24 +59,46 @@ public class CloneMarker : MonoBehaviour
         if (!found)
         {
             isSynced = true;
-            //EnsureCollider();
             DoubleEnemiesMod.Log($"[{gameObject.name}] Stopped syncing: {activeStateName}");
         }
     }
-    public void EnsureCollider()
+    private void SongGolemFix()
     {
-        var collider = GetComponent<Collider2D>();
-        if (collider == null)
+        if (original.name.Contains("song_golem"))
         {
-            collider = GetComponentInChildren<Collider2D>();
+            foreach (var heroDamager in Resources.FindObjectsOfTypeAll<DamageHero>())
+            {
+                if (heroDamager.gameObject.name == "Lava Rock Damager")
+                {
+                    UnityEngine.Object.DestroyImmediate(heroDamager);
+                    DoubleEnemiesMod.Log("Destroyed Rock Damager");
+                }
+            }
         }
-        if (collider == null)
+    }
+    private void CoralTowerFix()
+    {
+        // Coral Tower Arena fix
+        // yeah this code is messy but Coral tower is annoying
+        originalBattleScene = this.original.GetComponent<BattleScene>();
+        if (originalBattleScene == null)
         {
-            var circle = gameObject.AddComponent<CircleCollider2D>();
-            circle.isTrigger = false;
-            circle.radius = 1f;
+            originalBattleScene = this.original.GetComponentInChildren<BattleScene>();
+        }
+        if (originalBattleScene != null)
+        {
+            DoubleEnemiesMod.Log($"BattleScene component found in {originalBattleScene.gameObject.name}");
+            cloneBattleScene = GetComponent<BattleScene>();
+            if (cloneBattleScene == null)
+            {
+                cloneBattleScene = GetComponentInChildren<BattleScene>();
+            }
 
-            DoubleEnemiesMod.Log($"[{gameObject.name}] No collider found -> CircleCollider2D added");
+            if (gameObject.scene.name.Contains("Memory_Coral_Tower"))
+            {
+                DoubleEnemiesMod.Log("Coral Tower detected");
+                cloneBattleScene.StartBattle();
+            }
         }
     }
 

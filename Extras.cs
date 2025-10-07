@@ -56,7 +56,7 @@
         "Battle Scene"
     };
 }
-public enum EnemyCategory
+public enum EnemyType
 {
     Enemy,
     Arena,

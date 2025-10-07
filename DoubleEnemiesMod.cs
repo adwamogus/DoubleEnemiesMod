@@ -18,6 +18,8 @@ public class DoubleEnemiesMod : BaseUnityPlugin
     public static ConfigEntry<bool> EnableArenas;
     public static ConfigEntry<bool> EnableBosses;
 
+    public static ConfigEntry<bool> EnableSharedHP;
+
     private static ManualLogSource logger;
     private void Awake()
     {
@@ -41,21 +43,28 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             "Control",
             "Enable Enemies",
             true,
-            "Enables cloning of all normal enemies"
+            "Enables cloning of all normal enemies."
             );
 
         EnableArenas = Config.Bind(
             "Control",
             "Enable Arenas",
             true,
-            "Enables cloning of all arenas"
+            "Enables cloning of all arenas."
             );
 
         EnableBosses = Config.Bind(
             "Control",
             "Enable Bosses",
             true,
-            "Enables cloning of all bosses"
+            "Enables cloning of all bosses."
+            );
+
+        EnableSharedHP = Config.Bind(
+            "Control",
+            "Enable Shared HP",
+            true,
+            "Multiplies boss hp with the Multiplier and shares all damage between bosses. Supported bosses will now die at the same time."
             );
 
         Logger.LogInfo("Double Enemies Mod loaded");
@@ -128,7 +137,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
     }
     private static void CloneObject(GameObject gameObject)
     {
-        if (!CheckEnemyType(gameObject.name))
+        if (!CheckEnemyEnabled(gameObject.name))
         {
             return;
         }
@@ -152,13 +161,22 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             Log($"[Clone] {gameObject.name} -> {clone.name} in scene {gameObject.gameObject.scene.name}");
         }
     }
-    private static bool CheckEnemyType(string gameObjectName)
+    private static bool CheckEnemyEnabled(string gameObjectName)
     {
-        // Arena Check
-        foreach (var keyword in StringLists.ArenaFilterKeywords)
+        EnemyType type = GetEnemyType(gameObjectName);
+        switch (type)
         {
-            if (gameObjectName.Contains(keyword))
-            {
+            case EnemyType.Enemy:
+                if (EnableEnemies.Value)
+                {
+                    return true;
+                }
+                else
+                {
+                    Log($"[{gameObjectName}] was not cloned due to config settings (Enemy)");
+                    return false;
+                }
+            case EnemyType.Arena:
                 if (EnableArenas.Value)
                 {
                     return true;
@@ -168,13 +186,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                     Log($"[{gameObjectName}] was not cloned due to config settings (Arena)");
                     return false;
                 }
-            }
-        }
-        // Boss Check
-        foreach (var keyword in StringLists.BossFilterKeywords)
-        {
-            if (gameObjectName.Contains(keyword))
-            {
+            case EnemyType.Boss:
                 if (EnableBosses.Value)
                 {
                     return true;
@@ -184,17 +196,29 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                     Log($"[{gameObjectName}] was not cloned due to config settings (Boss)");
                     return false;
                 }
+        }
+        Log("$[{gameObjectName}] Invalid enemy type exception");
+        return false;
+    }
+    private static EnemyType GetEnemyType(string gameObjectName)
+    {
+        // Arena Check
+        foreach (var keyword in StringLists.ArenaFilterKeywords)
+        {
+            if (gameObjectName.Contains(keyword))
+            {
+                return EnemyType.Arena;
+            }
+        }
+        // Boss Check
+        foreach (var keyword in StringLists.BossFilterKeywords)
+        {
+            if (gameObjectName.Contains(keyword))
+            {
+                return EnemyType.Boss;
             }
         }
         // Enemy Check
-        if (EnableEnemies.Value)
-        {
-            return true;
-        }
-        else
-        {
-            Log($"[{gameObjectName}] was not cloned due to config settings (Enemy)");
-            return false;
-        }
+        return EnemyType.Enemy;
     } 
 }
