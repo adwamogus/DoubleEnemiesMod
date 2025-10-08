@@ -152,16 +152,18 @@ public class CloneMarker : MonoBehaviour
         // Check if Clone has taken more damage
         if (originalHealth.hp > cloneHealth.hp)
         {
-            int delta = originalHealth.hp - cloneHealth.hp;
+            int delta = Mathf.FloorToInt((originalHealth.hp - cloneHealth.hp) / (float)DoubleEnemiesMod.Multiplier.Value);
             DoubleEnemiesMod.Log($"SHP[{gameObject.name}/{cloneHealth.hp}] Apply {delta} to SHP[{original.gameObject.name}/{originalHealth.hp}]");
             originalHealth.ApplyExtraDamage(delta);
+            cloneHealth.ApplyExtraDamage(-delta);
         }
         // Check if original has taken more damage
         else if (cloneHealth.hp > originalHealth.hp)
         {
-            int delta = cloneHealth.hp - originalHealth.hp;
+            int delta = Mathf.FloorToInt((cloneHealth.hp - originalHealth.hp) / (float)DoubleEnemiesMod.Multiplier.Value);
             DoubleEnemiesMod.Log($"SHP[{gameObject.name}/{cloneHealth.hp}] Take {delta} from SHP[{original.gameObject.name}/{originalHealth.hp}]");
             cloneHealth.ApplyExtraDamage(delta);
+            originalHealth.ApplyExtraDamage(-delta);
         }
     }
 

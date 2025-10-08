@@ -7,7 +7,7 @@ using HutongGames.PlayMaker.Actions;
 using System;
 using UnityEngine;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.5.1")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.5.2")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
@@ -188,8 +188,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
         if (EnableSharedHP.Value && GetEnemyType(gameObject.name) == EnemyType.Boss && gameObject.name != "Silk Boss" && !hasMultipleHealthManagers)
         {
             isSharedHPEnabled = true;
-            healthManager.hp = healthManager.hp * Multiplier.Value;
-            Log($"[SharedHP] Increased HP of {gameObject.name} to: {healthManager.hp}");
+            Log($"[SharedHP] Activated for {gameObject.name}: {healthManager.hp}");
         }
 
         // Mark the original object before cloning
