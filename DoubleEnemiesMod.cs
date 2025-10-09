@@ -121,7 +121,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
     {
         DoubleEnemiesMod.Log($"[{__instance.gameObject.name}] HealthManagerDie: {__instance.isDead}, {__instance.hp}");
 
-        if (__instance.hp <= 0f)
+        if (HealthManagerEvents.IsDead(__instance.hp))
         {
             DoubleEnemiesMod.Log("death check");
             HealthManagerEvents.RaiseOnDie(__instance);
@@ -197,18 +197,9 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             return;
         }
 
-        HealthManager[] healths = gameObject.GetComponentsInChildren<HealthManager>(true);
-        bool hasMultipleHealthManagers = false;
-        if( healths.Length > 1 )
-        {
-            hasMultipleHealthManagers = true;
-            Log($"[SharedHP] {gameObject.name} has too many Health components");
-        }
-
         bool isSharedHPEnabled = false;
         // Grand Mother Silk doesn't work due to extra healthbars
-        // Dancers don't work because there are two original HealthManager
-        if (EnableSharedHP.Value && type == EnemyType.Boss && gameObject.name != "Silk Boss" && !hasMultipleHealthManagers)
+        if (EnableSharedHP.Value && type == EnemyType.Boss && gameObject.name != "Silk Boss")
         {
             isSharedHPEnabled = true;
             Log($"[SharedHP] Activated for {gameObject.name}: {healthManager.hp}");

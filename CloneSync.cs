@@ -8,8 +8,6 @@ using UnityEngine;
 
 public class CloneSync : MonoBehaviour
 {
-    private CloneMarker marker;
-
     private HealthManager originalHealth;
     private HealthManager cloneHealth;
 
@@ -21,9 +19,8 @@ public class CloneSync : MonoBehaviour
     private bool isSynced = false;
 
     private string lastLoggedState = "";
-    public void Init(CloneMarker marker, HealthManager originalHealth, HealthManager cloneHealth, bool isSharedHPEnabled)
+    public void Init(HealthManager originalHealth, HealthManager cloneHealth, bool isSharedHPEnabled)
     {
-        this.marker = marker;
         this.originalHealth = originalHealth;
         this.cloneHealth = cloneHealth;
 
@@ -114,11 +111,9 @@ public class CloneSync : MonoBehaviour
     }
     private void OnDeathOriginal(HealthManager sourceHealthManager)
     {
-        DoubleEnemiesMod.Log("Death original");
-        if (originalHealth == sourceHealthManager)
+        if (originalHealth.GetInstanceID() == sourceHealthManager.GetInstanceID())
         {
-            DoubleEnemiesMod.Log("correct method");
-            if (cloneHealth.hp >= 1)
+            if (!HealthManagerEvents.IsDead(cloneHealth.hp))
             {
                 DoubleEnemiesMod.Log($"[SharedHP Kill] SHP[{gameObject.name}/{cloneHealth.hp}]");
                 cloneHealth.ApplyExtraDamage(cloneHealth.hp);
@@ -127,11 +122,9 @@ public class CloneSync : MonoBehaviour
     }
     private void OnDeathClone(HealthManager sourceHealthManager)
     {
-        DoubleEnemiesMod.Log("Death clone");
-        if (cloneHealth == sourceHealthManager)
+        if (cloneHealth.GetInstanceID() == sourceHealthManager.GetInstanceID())
         {
-            DoubleEnemiesMod.Log("correct method");
-            if (originalHealth.hp >= 1)
+            if (!HealthManagerEvents.IsDead(originalHealth.hp))
             {
                 DoubleEnemiesMod.Log($"[SharedHP Kill] SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
                 originalHealth.ApplyExtraDamage(originalHealth.hp);
@@ -147,5 +140,16 @@ public static class HealthManagerEvents
     public static void RaiseOnDie(HealthManager hm)
     {
         OnDie?.Invoke(hm);
+    }
+    public static bool IsDead(int currentHP)
+    {
+        if (currentHP <= 0 || currentHP == 99999)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

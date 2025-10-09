@@ -5,6 +5,7 @@ using HarmonyLib;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using System;
+using System.Linq;
 using UnityEngine;
 
 public class CloneMarker : MonoBehaviour
@@ -31,13 +32,41 @@ public class CloneMarker : MonoBehaviour
         if (enemyType != EnemyType.Arena)
         {
             cloneHealth = GetComponent<HealthManager>();
+
             if(cloneHealth == null)
             {
-                cloneHealth = GetComponentInChildren<HealthManager>();
+                var cloneHealths = GetComponentsInChildren<HealthManager>();
+                cloneHealths = cloneHealths.OrderBy(c => c.transform.GetSiblingIndex())
+                                       .ThenBy(c => c.name)
+                                       .ToArray();
+
+                var originalHealths = GetComponentsInChildren<HealthManager>();
+                cloneHealths = cloneHealths.OrderBy(c => c.transform.GetSiblingIndex())
+                                       .ThenBy(c => c.name)
+                                       .ToArray();
+
+                if (originalHealths.Length != cloneHealths.Length)
+                {
+                    DoubleEnemiesMod.Log($"[{gameObject.name}] Non equal amount of Healthcomponents ({originalHealths.Length},{cloneHealths.Length})");
+                    return;
+                }
+
+                for (int i = 0; i < originalHealths.Length; i++)
+                {
+                    SyncPair(originalHealths[i], cloneHealths[i], isSharedHPEnabled);
+                }
             }
-            CloneSync sync = cloneHealth.gameObject.AddComponent<CloneSync>();
-            sync.Init(this, originalHealth, cloneHealth, isSharedHPEnabled);
+            else
+            {
+                SyncPair(originalHealth, cloneHealth, isSharedHPEnabled);
+            }
         }
+    }
+    private void SyncPair(HealthManager _originalHealth, HealthManager _cloneHealth, bool isSharedHPEnabled)
+    {
+        DoubleEnemiesMod.Log($"[{gameObject.name}] Pairing {_originalHealth.gameObject.name} with {_cloneHealth.gameObject.name}");
+        CloneSync sync = _cloneHealth.gameObject.AddComponent<CloneSync>();
+        sync.Init(_originalHealth, _cloneHealth, isSharedHPEnabled);
     }
     private void SongGolemFix()
     {

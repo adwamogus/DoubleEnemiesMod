@@ -33,11 +33,6 @@
         "Init", // Grandmother
         "Ready",
         "Wall", // Flint bug
-        //"Intro Pause", // Voltvyrm
-        //"Intro Antic",
-        //"Roar",
-        //"Dissapear 1",
-        //"Dissapear 2",
         "Ambush Ready",
     };
     public static readonly string[] ParentKeywords = new string[]
