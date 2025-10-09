@@ -105,6 +105,27 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             }
         }
     }
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(HealthManager), nameof(HealthManager.Die),
+    new Type[] {
+        typeof(float?),
+        typeof(AttackTypes),
+        typeof(NailElements),
+        typeof(GameObject),
+        typeof(bool),
+        typeof(float),
+        typeof(bool),
+        typeof(bool)
+    })]
+    private static void OnHealthManagerDie(HealthManager __instance)
+    {
+        DoubleEnemiesMod.Log($"[{__instance.gameObject.name}] HealthManagerDie: {__instance.isDead}, {__instance.hp}");
+        if (__instance.hp <= 0f)
+        {
+            __instance.isDead = true;
+            __instance.SendDeathEvent();
+        }
+    }
     private static void TryDuplicateInstance(HealthManager healthManager)
     {
         try

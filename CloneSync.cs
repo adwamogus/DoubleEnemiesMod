@@ -100,7 +100,6 @@ public class CloneSync : MonoBehaviour
         if (originalHealth.hp > cloneHealth.hp)
         {
             int delta = Mathf.FloorToInt((originalHealth.hp - cloneHealth.hp) / (float)DoubleEnemiesMod.Multiplier.Value);
-            //DoubleEnemiesMod.Log($"SHP[{gameObject.name}/{cloneHealth.hp}] Apply {delta} to SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
             originalHealth.ApplyExtraDamage(delta);
             cloneHealth.ApplyExtraDamage(-delta);
         }
@@ -108,7 +107,6 @@ public class CloneSync : MonoBehaviour
         else if (cloneHealth.hp > originalHealth.hp)
         {
             int delta = Mathf.FloorToInt((cloneHealth.hp - originalHealth.hp) / (float)DoubleEnemiesMod.Multiplier.Value);
-            //DoubleEnemiesMod.Log($"SHP[{gameObject.name}/{cloneHealth.hp}] Take {delta} from SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
             cloneHealth.ApplyExtraDamage(delta);
             originalHealth.ApplyExtraDamage(-delta);
         }
