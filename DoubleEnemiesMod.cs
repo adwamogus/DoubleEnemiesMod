@@ -120,10 +120,11 @@ public class DoubleEnemiesMod : BaseUnityPlugin
     private static void OnHealthManagerDie(HealthManager __instance)
     {
         DoubleEnemiesMod.Log($"[{__instance.gameObject.name}] HealthManagerDie: {__instance.isDead}, {__instance.hp}");
+
         if (__instance.hp <= 0f)
         {
-            __instance.isDead = true;
-            __instance.SendDeathEvent();
+            DoubleEnemiesMod.Log("death check");
+            HealthManagerEvents.RaiseOnDie(__instance);
         }
     }
     private static void TryDuplicateInstance(HealthManager healthManager)

@@ -40,8 +40,8 @@ public class CloneSync : MonoBehaviour
             originalHealth.TookDamage += CloneSharedHPUpdate;
             cloneHealth.TookDamage += CloneSharedHPUpdate;
 
-            originalHealth.OnDeath += OnDeathOriginal;
-            cloneHealth.OnDeath += OnDeathClone;
+            HealthManagerEvents.OnDie += OnDeathOriginal;
+            HealthManagerEvents.OnDie += OnDeathClone;
         }
     }
     private void OnDisable()
@@ -51,8 +51,8 @@ public class CloneSync : MonoBehaviour
             originalHealth.TookDamage -= CloneSharedHPUpdate;
             cloneHealth.TookDamage -= CloneSharedHPUpdate;
 
-            originalHealth.OnDeath -= OnDeathOriginal;
-            cloneHealth.OnDeath -= OnDeathClone;
+            HealthManagerEvents.OnDie -= OnDeathOriginal;
+            HealthManagerEvents.OnDie -= OnDeathClone;
         }
     }
     private void LateUpdate()
@@ -112,20 +112,40 @@ public class CloneSync : MonoBehaviour
         }
         DoubleEnemiesMod.Log($"[SharedHP Event After] SHP[{gameObject.name}/{cloneHealth.hp}] SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
     }
-    private void OnDeathOriginal()
+    private void OnDeathOriginal(HealthManager sourceHealthManager)
     {
-        if (!cloneHealth.isDead)
+        DoubleEnemiesMod.Log("Death original");
+        if (originalHealth == sourceHealthManager)
         {
-            DoubleEnemiesMod.Log($"[SharedHP Kill] SHP[{gameObject.name}/{cloneHealth.hp}]");
-            cloneHealth.ApplyExtraDamage(cloneHealth.hp);
+            DoubleEnemiesMod.Log("correct method");
+            if (cloneHealth.hp >= 1)
+            {
+                DoubleEnemiesMod.Log($"[SharedHP Kill] SHP[{gameObject.name}/{cloneHealth.hp}]");
+                cloneHealth.ApplyExtraDamage(cloneHealth.hp);
+            }
         }
     }
-    private void OnDeathClone()
+    private void OnDeathClone(HealthManager sourceHealthManager)
     {
-        if (!originalHealth.isDead)
+        DoubleEnemiesMod.Log("Death clone");
+        if (cloneHealth == sourceHealthManager)
         {
-            DoubleEnemiesMod.Log($"[SharedHP Kill] SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
-            originalHealth.ApplyExtraDamage(originalHealth.hp);
+            DoubleEnemiesMod.Log("correct method");
+            if (originalHealth.hp >= 1)
+            {
+                DoubleEnemiesMod.Log($"[SharedHP Kill] SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
+                originalHealth.ApplyExtraDamage(originalHealth.hp);
+            }
         }
+    }
+}
+
+public static class HealthManagerEvents
+{
+    public static Action<HealthManager> OnDie;
+
+    public static void RaiseOnDie(HealthManager hm)
+    {
+        OnDie?.Invoke(hm);
     }
 }
