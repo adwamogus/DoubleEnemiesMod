@@ -10,8 +10,8 @@ using UnityEngine;
 public class CloneMarker : MonoBehaviour
 {
     private GameObject original;
-
     private HealthManager originalHealth;
+
     private HealthManager cloneHealth;
 
     private BattleScene originalBattleScene;
@@ -19,67 +19,24 @@ public class CloneMarker : MonoBehaviour
 
     public Action StartBattle;
 
-    private bool isSynced = false;
-    private bool isClone = false;
-
-    public bool isSharedHPEnabled;
-
-    private string lastLoggedState = "";
-
-    public void CopyState(GameObject original, HealthManager healthManager)
+    public void CopyState(GameObject original, HealthManager healthManager, bool isSharedHPEnabled, EnemyType enemyType)
     {
         this.original = original;
         this.originalHealth = healthManager;
-        isClone = true;
 
         SongGolemFix();
 
         BattleSceneFix();
 
-        if (isSharedHPEnabled)
+        if (enemyType != EnemyType.Arena)
         {
             cloneHealth = GetComponent<HealthManager>();
             if(cloneHealth == null)
             {
                 cloneHealth = GetComponentInChildren<HealthManager>();
             }
-
-            originalHealth.TookDamage += CloneSharedHPUpdate;
-            cloneHealth.TookDamage += CloneSharedHPUpdate;
-        }
-    }
-    private void LateUpdate()
-    {
-        if (isSynced || !isClone) return;
-
-        //Sync
-        var activeStateName = original.GetComponent<PlayMakerFSM>()?.Fsm.ActiveStateName;
-        GetComponent<PlayMakerFSM>()?.SetState(activeStateName);
-        transform.position = original.transform.position;
-
-        if (activeStateName == null)
-        {
-            return;
-        }
-
-        if (activeStateName != lastLoggedState)
-        {
-            DoubleEnemiesMod.Log($"[{gameObject.name}] Current state: {activeStateName}");
-            lastLoggedState = activeStateName;
-        }
-
-        bool found = false;
-        foreach (var state in StringLists.SyncStates)
-        {
-            if (state == activeStateName)
-            {
-                found = true;
-            }
-        }
-        if (!found)
-        {
-            isSynced = true;
-            DoubleEnemiesMod.Log($"[{gameObject.name}] Stopped syncing: {activeStateName}");
+            CloneSync sync = cloneHealth.gameObject.AddComponent<CloneSync>();
+            sync.Init(originalHealth, cloneHealth, isSharedHPEnabled);
         }
     }
     private void SongGolemFix()
@@ -147,26 +104,6 @@ public class CloneMarker : MonoBehaviour
             }
         }
     }
-    private void CloneSharedHPUpdate()
-    {
-        // Check if Clone has taken more damage
-        if (originalHealth.hp > cloneHealth.hp)
-        {
-            int delta = Mathf.FloorToInt((originalHealth.hp - cloneHealth.hp) / (float)DoubleEnemiesMod.Multiplier.Value);
-            DoubleEnemiesMod.Log($"SHP[{gameObject.name}/{cloneHealth.hp}] Apply {delta} to SHP[{original.gameObject.name}/{originalHealth.hp}]");
-            originalHealth.ApplyExtraDamage(delta);
-            cloneHealth.ApplyExtraDamage(-delta);
-        }
-        // Check if original has taken more damage
-        else if (cloneHealth.hp > originalHealth.hp)
-        {
-            int delta = Mathf.FloorToInt((cloneHealth.hp - originalHealth.hp) / (float)DoubleEnemiesMod.Multiplier.Value);
-            DoubleEnemiesMod.Log($"SHP[{gameObject.name}/{cloneHealth.hp}] Take {delta} from SHP[{original.gameObject.name}/{originalHealth.hp}]");
-            cloneHealth.ApplyExtraDamage(delta);
-            originalHealth.ApplyExtraDamage(-delta);
-        }
-    }
-
     private void LogAllComponents()
     {
         DoubleEnemiesMod.Log($"--- Components on {gameObject.name} ---");

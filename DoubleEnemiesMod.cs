@@ -7,7 +7,7 @@ using HutongGames.PlayMaker.Actions;
 using System;
 using UnityEngine;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.5.2")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.6.0")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
@@ -84,7 +84,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
     [HarmonyPatch(typeof(HealthManager), "Start")]
     private static void OnHealthManagerEnabled(HealthManager __instance)
     {
-        if (__instance == null) return;
+        if (__instance == null || Multiplier.Value <= 1) return;
         TryDuplicateInstance(__instance);
     }
     [HarmonyPostfix]
@@ -169,7 +169,8 @@ public class DoubleEnemiesMod : BaseUnityPlugin
     }
     private static void CloneObject(GameObject gameObject, HealthManager healthManager)
     {
-        if (!CheckEnemyEnabled(gameObject.name))
+        EnemyType type = GetEnemyType(gameObject.name);
+        if (!CheckEnemyEnabled(type, gameObject.name))
         {
             return;
         }
@@ -185,7 +186,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
         bool isSharedHPEnabled = false;
         // Grand Mother Silk doesn't work due to extra healthbars
         // Dancers don't work because there are two original HealthManager
-        if (EnableSharedHP.Value && GetEnemyType(gameObject.name) == EnemyType.Boss && gameObject.name != "Silk Boss" && !hasMultipleHealthManagers)
+        if (EnableSharedHP.Value && type == EnemyType.Boss && gameObject.name != "Silk Boss" && !hasMultipleHealthManagers)
         {
             isSharedHPEnabled = true;
             Log($"[SharedHP] Activated for {gameObject.name}: {healthManager.hp}");
@@ -193,7 +194,6 @@ public class DoubleEnemiesMod : BaseUnityPlugin
 
         // Mark the original object before cloning
         CloneMarker originalCloneMarker = gameObject.AddComponent<CloneMarker>();
-        originalCloneMarker.isSharedHPEnabled = isSharedHPEnabled;
 
         for(int i = 0; i < Multiplier.Value - 1; i++)
         {
@@ -206,16 +206,14 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             );
             clone.name += "DECLONE";
             CloneMarker cloneMarker = clone.GetComponent<CloneMarker>();
-            cloneMarker.isSharedHPEnabled = isSharedHPEnabled;
-            cloneMarker.CopyState(gameObject, healthManager);
+            cloneMarker.CopyState(gameObject, healthManager, isSharedHPEnabled, type);
 
             // Log clone
             Log($"[Clone] {gameObject.name} -> {clone.name} in scene {gameObject.gameObject.scene.name}");
         }
     }
-    private static bool CheckEnemyEnabled(string gameObjectName)
+    private static bool CheckEnemyEnabled(EnemyType type, string gameObjectName)
     {
-        EnemyType type = GetEnemyType(gameObjectName);
         switch (type)
         {
             case EnemyType.Enemy:
@@ -273,14 +271,4 @@ public class DoubleEnemiesMod : BaseUnityPlugin
         // Enemy Check
         return EnemyType.Enemy;
     } 
-}
-
-[HarmonyPatch(typeof(BattleScene))]
-[HarmonyPatch("StartBattle")]
-public static class Patch_BattleScene_StartBattle
-{
-    public static void Postfix(BattleScene __instance)
-    {
-        
-    }
 }

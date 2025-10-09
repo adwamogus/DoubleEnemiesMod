@@ -32,11 +32,11 @@
         "Init", // Grandmother
         "Ready",
         "Wall", // Flint bug
-        "Intro Pause", // Voltvyrm
-        "Intro Antic",
-        "Roar",
-        "Dissapear 1",
-        "Dissapear 2",
+        //"Intro Pause", // Voltvyrm
+        //"Intro Antic",
+        //"Roar",
+        //"Dissapear 1",
+        //"Dissapear 2",
         "Ambush Ready",
     };
     public static readonly string[] ParentKeywords = new string[]
@@ -50,7 +50,6 @@
         "First Weaver",
         "Silk Boss",
         "Lace Boss2 New",
-        "Zap Core Enemy",
     };
     public static readonly string[] BossFilterKeywords = new string[]
     {
@@ -65,7 +64,6 @@
         "Lace Boss2 New",
         "Swamp Shaman",
         "Roachkeeper Chef",
-        "Zap Core Enemy",
     };
     public static readonly string[] ArenaFilterKeywords = new string[]
     {
