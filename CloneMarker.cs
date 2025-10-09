@@ -36,7 +36,7 @@ public class CloneMarker : MonoBehaviour
                 cloneHealth = GetComponentInChildren<HealthManager>();
             }
             CloneSync sync = cloneHealth.gameObject.AddComponent<CloneSync>();
-            sync.Init(originalHealth, cloneHealth, isSharedHPEnabled);
+            sync.Init(this, originalHealth, cloneHealth, isSharedHPEnabled);
         }
     }
     private void SongGolemFix()

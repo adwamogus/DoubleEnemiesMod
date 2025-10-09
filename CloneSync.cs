@@ -8,19 +8,22 @@ using UnityEngine;
 
 public class CloneSync : MonoBehaviour
 {
+    private CloneMarker marker;
+
     private HealthManager originalHealth;
     private HealthManager cloneHealth;
 
     private PlayMakerFSM originalFSM;
     private PlayMakerFSM cloneFSM;
 
+    private bool isSharedHPEnabled;
+
     private bool isSynced = false;
 
-    private bool alwaysSync = false;
-
     private string lastLoggedState = "";
-    public void Init(HealthManager originalHealth, HealthManager cloneHealth, bool isSharedHPEnabled)
+    public void Init(CloneMarker marker, HealthManager originalHealth, HealthManager cloneHealth, bool isSharedHPEnabled)
     {
+        this.marker = marker;
         this.originalHealth = originalHealth;
         this.cloneHealth = cloneHealth;
 
@@ -36,12 +39,20 @@ public class CloneSync : MonoBehaviour
         {
             originalHealth.TookDamage += CloneSharedHPUpdate;
             cloneHealth.TookDamage += CloneSharedHPUpdate;
-        }
 
-        if (gameObject.name.Contains("Zap Core Enemy"))
+            originalHealth.OnDeath += OnDeathOriginal;
+            cloneHealth.OnDeath += OnDeathClone;
+        }
+    }
+    private void OnDisable()
+    {
+        if (isSharedHPEnabled)
         {
-            alwaysSync = true;
-            DoubleEnemiesMod.Log($"[{gameObject.name}] AlwaysSync activated");
+            originalHealth.TookDamage -= CloneSharedHPUpdate;
+            cloneHealth.TookDamage -= CloneSharedHPUpdate;
+
+            originalHealth.OnDeath -= OnDeathOriginal;
+            cloneHealth.OnDeath -= OnDeathClone;
         }
     }
     private void LateUpdate()
@@ -52,11 +63,6 @@ public class CloneSync : MonoBehaviour
         var activeStateName = originalFSM.Fsm.ActiveStateName;
         cloneFSM.SetState(activeStateName);
         transform.position = originalHealth.transform.position;
-
-        if (alwaysSync)
-        {
-            return;
-        }
 
         if (activeStateName == null)
         {
@@ -85,11 +91,16 @@ public class CloneSync : MonoBehaviour
     }
     private void CloneSharedHPUpdate()
     {
+        if (originalHealth.isDead|| cloneHealth.isDead)
+        {
+            return;
+        }
+        DoubleEnemiesMod.Log($"[SharedHP Event Before] SHP[{gameObject.name}/{cloneHealth.hp}] SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
         // Check if Clone has taken more damage
         if (originalHealth.hp > cloneHealth.hp)
         {
             int delta = Mathf.FloorToInt((originalHealth.hp - cloneHealth.hp) / (float)DoubleEnemiesMod.Multiplier.Value);
-            DoubleEnemiesMod.Log($"SHP[{gameObject.name}/{cloneHealth.hp}] Apply {delta} to SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
+            //DoubleEnemiesMod.Log($"SHP[{gameObject.name}/{cloneHealth.hp}] Apply {delta} to SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
             originalHealth.ApplyExtraDamage(delta);
             cloneHealth.ApplyExtraDamage(-delta);
         }
@@ -97,9 +108,26 @@ public class CloneSync : MonoBehaviour
         else if (cloneHealth.hp > originalHealth.hp)
         {
             int delta = Mathf.FloorToInt((cloneHealth.hp - originalHealth.hp) / (float)DoubleEnemiesMod.Multiplier.Value);
-            DoubleEnemiesMod.Log($"SHP[{gameObject.name}/{cloneHealth.hp}] Take {delta} from SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
+            //DoubleEnemiesMod.Log($"SHP[{gameObject.name}/{cloneHealth.hp}] Take {delta} from SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
             cloneHealth.ApplyExtraDamage(delta);
             originalHealth.ApplyExtraDamage(-delta);
+        }
+        DoubleEnemiesMod.Log($"[SharedHP Event After] SHP[{gameObject.name}/{cloneHealth.hp}] SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
+    }
+    private void OnDeathOriginal()
+    {
+        if (!cloneHealth.isDead)
+        {
+            DoubleEnemiesMod.Log($"[SharedHP Kill] SHP[{gameObject.name}/{cloneHealth.hp}]");
+            cloneHealth.ApplyExtraDamage(cloneHealth.hp);
+        }
+    }
+    private void OnDeathClone()
+    {
+        if (!originalHealth.isDead)
+        {
+            DoubleEnemiesMod.Log($"[SharedHP Kill] SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
+            originalHealth.ApplyExtraDamage(originalHealth.hp);
         }
     }
 }

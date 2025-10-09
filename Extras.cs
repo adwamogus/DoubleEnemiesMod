@@ -3,6 +3,7 @@
     public static readonly string[] Blacklist = new string[]
     {
         "Crystal Drifter",
+        "Zap Core Enemy",
     };
     public static readonly string[] BlacklistedScenes = new string[]
     {
