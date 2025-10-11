@@ -11,6 +11,11 @@
         "Shadow_18",
         "Dust_Chef",
     };
+    public static readonly string[] SyncBlacklist = new string[]
+    {
+        "Mossbone Mother A",
+        "Mossbone Mother B",
+    };
     public static readonly string[] SyncStates = new string[]
     {
         "Pause", // Lost Lace

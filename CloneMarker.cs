@@ -27,8 +27,6 @@ public class CloneMarker : MonoBehaviour
 
         SongGolemFix();
 
-        BattleSceneFix();
-
         if (enemyType != EnemyType.Arena)
         {
             cloneHealth = GetComponent<HealthManager>();
@@ -61,9 +59,21 @@ public class CloneMarker : MonoBehaviour
                 SyncPair(originalHealth, cloneHealth, isSharedHPEnabled);
             }
         }
+        else
+        {
+            BattleSceneFix();
+        }
     }
     private void SyncPair(HealthManager _originalHealth, HealthManager _cloneHealth, bool isSharedHPEnabled)
     {
+        foreach (var blocked in StringLists.SyncBlacklist)
+        {
+            if (_originalHealth.gameObject.name.Contains(blocked))
+            {
+                DoubleEnemiesMod.Log($"[{_originalHealth.gameObject.name}] is on the sync blacklist");
+                return;
+            }
+        }
         DoubleEnemiesMod.Log($"[{gameObject.name}] Pairing {_originalHealth.gameObject.name} with {_cloneHealth.gameObject.name}");
         CloneSync sync = _cloneHealth.gameObject.AddComponent<CloneSync>();
         sync.Init(_originalHealth, _cloneHealth, isSharedHPEnabled);
