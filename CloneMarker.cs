@@ -27,6 +27,11 @@ public class CloneMarker : MonoBehaviour
 
         SongGolemFix();
 
+        if (original.name.Contains("Boss Scene"))
+        {
+            LogAllComponents();
+        }
+
         if (enemyType != EnemyType.Arena)
         {
             cloneHealth = GetComponent<HealthManager>();
@@ -76,7 +81,7 @@ public class CloneMarker : MonoBehaviour
         }
         DoubleEnemiesMod.Log($"[{gameObject.name}] Pairing {_originalHealth.gameObject.name} with {_cloneHealth.gameObject.name}");
         CloneSync sync = _cloneHealth.gameObject.AddComponent<CloneSync>();
-        sync.Init(_originalHealth, _cloneHealth, isSharedHPEnabled);
+        sync.Init(this, _originalHealth, _cloneHealth, isSharedHPEnabled);
     }
     private void SongGolemFix()
     {
@@ -88,6 +93,26 @@ public class CloneMarker : MonoBehaviour
                 {
                     UnityEngine.Object.DestroyImmediate(heroDamager);
                     DoubleEnemiesMod.Log("Destroyed Rock Damager");
+                }
+            }
+        }
+    }
+    public void LastJudgeFix()
+    {
+        if (originalHealth.name.Contains("Last Judge"))
+        {
+            string[] gateNames = { "Great Gate", "Gate L", "Gate Quest Ender", "Gate Open Trigger" };
+            foreach (string gateName in gateNames)
+            {
+                Transform t = gameObject.transform.Find(gateName);
+                if (t != null)
+                {
+                    DoubleEnemiesMod.Log($"LastJudgeFix: Found '{gateName}', destroying...");
+                    Destroy(t.gameObject);
+                }
+                else
+                {
+                    DoubleEnemiesMod.Log($"LastJudgeFix: Could not find '{gateName}' on {gameObject.name}");
                 }
             }
         }

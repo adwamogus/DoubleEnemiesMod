@@ -8,6 +8,8 @@ using UnityEngine;
 
 public class CloneSync : MonoBehaviour
 {
+    private CloneMarker marker;
+
     private HealthManager originalHealth;
     private HealthManager cloneHealth;
 
@@ -19,8 +21,10 @@ public class CloneSync : MonoBehaviour
     private bool isSynced = false;
 
     private string lastLoggedState = "";
-    public void Init(HealthManager originalHealth, HealthManager cloneHealth, bool isSharedHPEnabled)
+    public void Init(CloneMarker marker, HealthManager originalHealth, HealthManager cloneHealth, bool isSharedHPEnabled)
     {
+        this.marker = marker;
+
         this.originalHealth = originalHealth;
         this.cloneHealth = cloneHealth;
 
@@ -36,6 +40,10 @@ public class CloneSync : MonoBehaviour
         {
             originalHealth.TookDamage += CloneSharedHPUpdate;
             cloneHealth.TookDamage += CloneSharedHPUpdate;
+            if(gameObject.name.Contains("Last Judge"))
+            {
+                cloneHealth.TookDamage += OnLastJudgeDamaged;
+            }
 
             HealthManagerEvents.OnDie += OnDeathOriginal;
             HealthManagerEvents.OnDie += OnDeathClone;
@@ -130,6 +138,11 @@ public class CloneSync : MonoBehaviour
                 originalHealth.ApplyExtraDamage(originalHealth.hp);
             }
         }
+    }
+    private void OnLastJudgeDamaged()
+    {
+        marker.LastJudgeFix();
+        cloneHealth.TookDamage -= OnLastJudgeDamaged;
     }
 }
 
