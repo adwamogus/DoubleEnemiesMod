@@ -27,11 +27,6 @@ public class CloneMarker : MonoBehaviour
 
         SongGolemFix();
 
-        if (original.name.Contains("Boss Scene"))
-        {
-            LogAllComponents();
-        }
-
         if (enemyType != EnemyType.Arena)
         {
             cloneHealth = GetComponent<HealthManager>();

@@ -40,6 +40,8 @@ public class CloneSync : MonoBehaviour
         {
             originalHealth.TookDamage += CloneSharedHPUpdate;
             cloneHealth.TookDamage += CloneSharedHPUpdate;
+
+            // We are doing this here so we can ensure that the clone has spawned first
             if(gameObject.name.Contains("Last Judge"))
             {
                 cloneHealth.TookDamage += OnLastJudgeDamaged;
