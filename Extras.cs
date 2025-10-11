@@ -29,7 +29,6 @@
         "Battle Roar",
         "Battle Roar End",
         "Battle Dance",
-        "Take Control", // Lace 1
         "Init", // Grandmother
         "Ready",
         "Wall", // Flint bug
