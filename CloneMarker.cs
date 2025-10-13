@@ -34,13 +34,11 @@ public class CloneMarker : MonoBehaviour
             if(cloneHealth == null)
             {
                 var cloneHealths = GetComponentsInChildren<HealthManager>();
-                cloneHealths = cloneHealths.OrderBy(c => c.transform.GetSiblingIndex())
-                                       .ThenBy(c => c.name)
+                cloneHealths = cloneHealths.OrderBy(c => c.name)
                                        .ToArray();
 
                 var originalHealths = GetComponentsInChildren<HealthManager>();
-                cloneHealths = cloneHealths.OrderBy(c => c.transform.GetSiblingIndex())
-                                       .ThenBy(c => c.name)
+                cloneHealths = cloneHealths.OrderBy(c => c.name)
                                        .ToArray();
 
                 if (originalHealths.Length != cloneHealths.Length)
@@ -66,6 +64,12 @@ public class CloneMarker : MonoBehaviour
     }
     private void SyncPair(HealthManager _originalHealth, HealthManager _cloneHealth, bool isSharedHPEnabled)
     {
+        if (!_cloneHealth.gameObject.name.Contains(_originalHealth.gameObject.name))
+        {
+            DoubleEnemiesMod.Log($"[{_originalHealth.gameObject.name}] {_originalHealth.gameObject.name} and {_cloneHealth.gameObject.name} do not share a name");
+            return;
+        }
+
         foreach (var blocked in StringLists.SyncBlacklist)
         {
             if (_originalHealth.gameObject.name.Contains(blocked))
@@ -74,6 +78,7 @@ public class CloneMarker : MonoBehaviour
                 return;
             }
         }
+        
         DoubleEnemiesMod.Log($"[{gameObject.name}] Pairing {_originalHealth.gameObject.name} with {_cloneHealth.gameObject.name}");
         CloneSync sync = _cloneHealth.gameObject.AddComponent<CloneSync>();
         sync.Init(this, _originalHealth, _cloneHealth, isSharedHPEnabled);
