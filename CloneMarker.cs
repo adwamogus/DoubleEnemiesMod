@@ -27,6 +27,8 @@ public class CloneMarker : MonoBehaviour
 
         SongGolemFix();
 
+        DeleteMossBerry();
+
         if (enemyType != EnemyType.Arena)
         {
             cloneHealth = GetComponent<HealthManager>();
@@ -165,6 +167,26 @@ public class CloneMarker : MonoBehaviour
             {
                 DoubleEnemiesMod.Log("Coral Tower detected");
                 cloneBattleScene.StartBattle();
+            }
+        }
+    }
+    private void DeleteMossBerry()
+    {
+        if (gameObject.name.Contains("Aspid Collector"))
+        {
+            string[] berry_names = { "Mossberry Pickup", "Berry Sprite" };
+            foreach (string berry_name in berry_names)
+            {
+                Transform t = gameObject.transform.Find(berry_name);
+                if (t != null)
+                {
+                    DoubleEnemiesMod.Log($"DeleteMossberry: Found '{berry_name}', destroying...");
+                    Destroy(t.gameObject);
+                }
+                else
+                {
+                    DoubleEnemiesMod.Log($"DeleteMossberry: Could not find '{berry_name}' on {gameObject.name}");
+                }
             }
         }
     }

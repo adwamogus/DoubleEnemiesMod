@@ -4,12 +4,14 @@
     {
         "Crystal Drifter",
         "Zap Core Enemy",
+        "Music Box Bell",
     };
     public static readonly string[] BlacklistedScenes = new string[]
     {
         "Shellwood_18",
         "Shadow_18",
         "Dust_Chef",
+        "Bone_18",
     };
     public static readonly string[] SyncBlacklist = new string[]
     {
