@@ -5,7 +5,9 @@ using HarmonyLib;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.6.3")]
 public class DoubleEnemiesMod : BaseUnityPlugin
@@ -69,6 +71,64 @@ public class DoubleEnemiesMod : BaseUnityPlugin
 
         Logger.LogInfo("Double Enemies Mod loaded");
         Harmony.CreateAndPatchAll(typeof(DoubleEnemiesMod));
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+    {
+        if (scene.name.Contains("Wisp") || scene.name.Contains("Belltown_08"))
+            StartCoroutine(DelayedScanWisps(scene));
+    }
+    private IEnumerator DelayedScanWisps(Scene scene)
+    {
+        //yield return null;
+        yield return new WaitForSeconds(0.1f);
+
+        foreach (var root in scene.GetRootGameObjects())
+        {
+            if (root.name.Contains("Wisp Flame Lantern") || root.name.Contains("Boss Scene"))
+            {
+
+                Log($"[Clone] Cloning {root.name} in {scene.name}");
+                var clone = GameObject.Instantiate(
+                    root,
+                    root.transform.position,
+                    root.transform.rotation,
+                    root.transform.parent
+                );
+            }
+        }
+    }
+    private void LogAllComponents(GameObject gameObject)
+    {
+        DoubleEnemiesMod.Log($"--- Components on {gameObject.name} ---");
+
+        Component[] components = gameObject.GetComponents<Component>();
+
+        foreach (Component comp in components)
+        {
+            if (comp != null)
+                DoubleEnemiesMod.Log(comp.GetType().Name);
+            else
+                DoubleEnemiesMod.Log("Missing (null) Component found!");
+        }
+
+        foreach (Transform child in gameObject.transform)
+        {
+            DoubleEnemiesMod.Log($"[{gameObject.name}] has child: {child.gameObject.name}");
+            components = child.GetComponents<Component>();
+
+            DoubleEnemiesMod.Log($"--- Components on {child.name} ---");
+
+            foreach (Component comp in components)
+            {
+                if (comp != null)
+                    DoubleEnemiesMod.Log(comp.GetType().Name);
+                else
+                    DoubleEnemiesMod.Log("Missing (null) Component found!");
+            }
+        }
     }
     public static void Log(string msg)
     {
@@ -213,7 +273,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             // Create clone
             var clone = GameObject.Instantiate(
                 gameObject,
-                gameObject.transform.position + Vector3.back * 0.01f,
+                gameObject.transform.position,
                 gameObject.transform.rotation,
                 gameObject.transform.parent
             );
