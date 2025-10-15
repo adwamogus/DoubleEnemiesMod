@@ -74,7 +74,6 @@ public class DoubleEnemiesMod : BaseUnityPlugin
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
-
     private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
         if (scene.name.Contains("Wisp") || scene.name.Contains("Belltown_08"))
@@ -82,7 +81,6 @@ public class DoubleEnemiesMod : BaseUnityPlugin
     }
     private IEnumerator DelayedScanWisps(Scene scene)
     {
-        //yield return null;
         yield return new WaitForSeconds(0.1f);
 
         foreach (var root in scene.GetRootGameObjects())
