@@ -163,6 +163,7 @@
     <Compile Include="DoubleEnemiesMod.cs" />
     <Compile Include="Extras.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SharedHP.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

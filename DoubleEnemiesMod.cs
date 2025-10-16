@@ -9,7 +9,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.6.3")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.7.0")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
@@ -95,36 +95,6 @@ public class DoubleEnemiesMod : BaseUnityPlugin
                     root.transform.rotation,
                     root.transform.parent
                 );
-            }
-        }
-    }
-    private void LogAllComponents(GameObject gameObject)
-    {
-        DoubleEnemiesMod.Log($"--- Components on {gameObject.name} ---");
-
-        Component[] components = gameObject.GetComponents<Component>();
-
-        foreach (Component comp in components)
-        {
-            if (comp != null)
-                DoubleEnemiesMod.Log(comp.GetType().Name);
-            else
-                DoubleEnemiesMod.Log("Missing (null) Component found!");
-        }
-
-        foreach (Transform child in gameObject.transform)
-        {
-            DoubleEnemiesMod.Log($"[{gameObject.name}] has child: {child.gameObject.name}");
-            components = child.GetComponents<Component>();
-
-            DoubleEnemiesMod.Log($"--- Components on {child.name} ---");
-
-            foreach (Component comp in components)
-            {
-                if (comp != null)
-                    DoubleEnemiesMod.Log(comp.GetType().Name);
-                else
-                    DoubleEnemiesMod.Log("Missing (null) Component found!");
             }
         }
     }

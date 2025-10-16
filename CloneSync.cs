@@ -38,8 +38,7 @@ public class CloneSync : MonoBehaviour
 
         if (isSharedHPEnabled)
         {
-            originalHealth.TookDamage += CloneSharedHPUpdate;
-            cloneHealth.TookDamage += CloneSharedHPUpdate;
+            SharedHPManager.Connect(originalHealth, cloneHealth);
 
             // We are doing this here so we can ensure that the clone has spawned first
             if(gameObject.name.Contains("Last Judge"))
@@ -55,9 +54,6 @@ public class CloneSync : MonoBehaviour
     {
         if (isSharedHPEnabled)
         {
-            originalHealth.TookDamage -= CloneSharedHPUpdate;
-            cloneHealth.TookDamage -= CloneSharedHPUpdate;
-
             HealthManagerEvents.OnDie -= OnDeathOriginal;
             HealthManagerEvents.OnDie -= OnDeathClone;
         }
@@ -95,29 +91,6 @@ public class CloneSync : MonoBehaviour
             isSynced = true;
             DoubleEnemiesMod.Log($"[{gameObject.name}] Stopped syncing: {activeStateName}");
         }
-    }
-    private void CloneSharedHPUpdate()
-    {
-        if (originalHealth.isDead|| cloneHealth.isDead)
-        {
-            return;
-        }
-        DoubleEnemiesMod.Log($"[SharedHP Event Before] SHP[{gameObject.name}/{cloneHealth.hp}] SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
-        // Check if Clone has taken more damage
-        if (originalHealth.hp > cloneHealth.hp)
-        {
-            int delta = Mathf.FloorToInt((originalHealth.hp - cloneHealth.hp) / (float)DoubleEnemiesMod.Multiplier.Value);
-            originalHealth.ApplyExtraDamage(delta);
-            cloneHealth.ApplyExtraDamage(-delta);
-        }
-        // Check if original has taken more damage
-        else if (cloneHealth.hp > originalHealth.hp)
-        {
-            int delta = Mathf.FloorToInt((cloneHealth.hp - originalHealth.hp) / (float)DoubleEnemiesMod.Multiplier.Value);
-            cloneHealth.ApplyExtraDamage(delta);
-            originalHealth.ApplyExtraDamage(-delta);
-        }
-        DoubleEnemiesMod.Log($"[SharedHP Event After] SHP[{gameObject.name}/{cloneHealth.hp}] SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
     }
     private void OnDeathOriginal(HealthManager sourceHealthManager)
     {

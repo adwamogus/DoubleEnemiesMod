@@ -15,7 +15,6 @@ public class CloneMarker : MonoBehaviour
 
     private HealthManager cloneHealth;
 
-    private BattleScene originalBattleScene;
     private BattleScene cloneBattleScene;
 
     public Action StartBattle;
@@ -29,6 +28,8 @@ public class CloneMarker : MonoBehaviour
 
         DeleteMossBerry();
 
+        
+
         if (enemyType != EnemyType.Arena)
         {
             cloneHealth = GetComponent<HealthManager>();
@@ -39,8 +40,8 @@ public class CloneMarker : MonoBehaviour
                 cloneHealths = cloneHealths.OrderBy(c => c.name)
                                        .ToArray();
 
-                var originalHealths = GetComponentsInChildren<HealthManager>();
-                cloneHealths = cloneHealths.OrderBy(c => c.name)
+                var originalHealths = original.GetComponentsInChildren<HealthManager>();
+                originalHealths = originalHealths.OrderBy(c => c.name)
                                        .ToArray();
 
                 if (originalHealths.Length != cloneHealths.Length)
@@ -142,31 +143,6 @@ public class CloneMarker : MonoBehaviour
                     DoubleEnemiesMod.Log("original BattleScene hase no marker");
                 }
                 
-            }
-        }
-    }
-    private void CoralTowerFix()
-    {
-        // Coral Tower Arena fix
-        // yeah this code is messy but Coral tower is annoying
-        originalBattleScene = this.original.GetComponent<BattleScene>();
-        if (originalBattleScene == null)
-        {
-            originalBattleScene = this.original.GetComponentInChildren<BattleScene>();
-        }
-        if (originalBattleScene != null)
-        {
-            DoubleEnemiesMod.Log($"BattleScene component found in {originalBattleScene.gameObject.name}");
-            cloneBattleScene = GetComponent<BattleScene>();
-            if (cloneBattleScene == null)
-            {
-                cloneBattleScene = GetComponentInChildren<BattleScene>();
-            }
-
-            if (gameObject.scene.name.Contains("Memory_Coral_Tower"))
-            {
-                DoubleEnemiesMod.Log("Coral Tower detected");
-                cloneBattleScene.StartBattle();
             }
         }
     }
