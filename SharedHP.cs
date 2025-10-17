@@ -18,19 +18,21 @@ public static class SharedHPManager
 
     public static void Connect(HealthManager original, HealthManager clone)
     {
-        int originalID = id;
-        int cloneID = id + 1;
+        SharedHPID sharedHPID = original.GetComponent<SharedHPID>();
 
-        id += 2;
-
-        if (!SharedHpInstances.ContainsKey(originalID))
+        if (sharedHPID == null)
         {
+            int instanceID = id;
+            id++;
+
+            SharedHpInstances.Add(instanceID, new SharedHPInstance(original));
+            sharedHPID = AddSharedHPID(original, instanceID);
+
             DoubleEnemiesMod.Log($"[SharedHPManager] Created new SharedHPInstance ({original.gameObject.name})");
-            SharedHpInstances.Add(originalID, new SharedHPInstance(original));
         }
 
-        SharedHpInstances.Add(cloneID, SharedHpInstances[originalID]);
-        SharedHpInstances[cloneID].AddToList(clone);
+        SharedHpInstances[sharedHPID.ID].AddToList(clone);
+        AddSharedHPID(clone, sharedHPID.ID);
     }
     public static void Clear()
     {
@@ -38,8 +40,13 @@ public static class SharedHPManager
         {
             DoubleEnemiesMod.Log("[SharedHPManager] Cleared all SharedHPInstances");
             SharedHpInstances.Clear();
-            id = 0;
         }
+    }
+    public static SharedHPID AddSharedHPID(HealthManager healthManager, int id)
+    {
+        SharedHPID idComponent = healthManager.gameObject.AddComponent<SharedHPID>();
+        idComponent.ID = id;
+        return idComponent;
     }
 }
 
@@ -77,7 +84,7 @@ public class SharedHPInstance
     }
     private void DistributeHP()
     {
-        float sum = residualDamage;
+        float sum = -residualDamage;
 
         foreach (HealthManager hp in hpComponents)
         {
@@ -86,16 +93,20 @@ public class SharedHPInstance
 
         float average = sum / DoubleEnemiesMod.Multiplier.Value;
 
-        float targetHP = Mathf.CeilToInt(average);
+        int targetHP = Mathf.CeilToInt(average);
 
         residualDamage = (targetHP - average) * DoubleEnemiesMod.Multiplier.Value;
 
         foreach (HealthManager hp in hpComponents)
         {
-            // setting hp doesn't always work for some reason
-            hp.ApplyExtraDamage(hp.hp - (int)targetHP);
+            hp.ApplyExtraDamage(hp.hp - targetHP);
         }
 
         DoubleEnemiesMod.Log($"[SharedHpInstance/{name}] HP distributed: targetHP/{targetHP}, residualDamage/{residualDamage}");
     }
+}
+
+public class SharedHPID : MonoBehaviour
+{
+    public int ID;
 }
