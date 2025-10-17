@@ -28,8 +28,6 @@ public class CloneMarker : MonoBehaviour
 
         DeleteMossBerry();
 
-        
-
         if (enemyType != EnemyType.Arena)
         {
             cloneHealth = GetComponent<HealthManager>();
