@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Security.Policy;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static DamageTag;
 
 public static class SharedHPManager
 {
@@ -47,6 +48,10 @@ public static class SharedHPManager
         SharedHPID idComponent = healthManager.gameObject.AddComponent<SharedHPID>();
         idComponent.ID = id;
         return idComponent;
+    }
+    public static void ReportDeath(HealthManager healthManager, int id)
+    {
+        SharedHpInstances[id].DeathSync();
     }
 }
 
@@ -103,6 +108,33 @@ public class SharedHPInstance
         }
 
         DoubleEnemiesMod.Log($"[SharedHpInstance/{name}] HP distributed: targetHP/{targetHP}, residualDamage/{residualDamage}");
+    }
+    public void DeathSync()
+    {
+        foreach (HealthManager hp in hpComponents)
+        {
+            if (!IsDead(hp.hp))
+            {
+                DamageTagInstance damageTag = new DamageTagInstance();
+                damageTag.isHeroDamage = true;
+                damageTag.amount = hp.hp;
+                damageTag.specialDamageType = SpecialDamageTypes.None;
+                damageTag.nailElements = NailElements.None;
+
+                hp.ApplyTagDamage(damageTag);
+            }
+        }
+    }
+    public bool IsDead(int currentHP)
+    {
+        if (currentHP <= 0 || currentHP == 99999)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
 

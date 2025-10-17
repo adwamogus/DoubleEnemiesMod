@@ -149,10 +149,10 @@ public class DoubleEnemiesMod : BaseUnityPlugin
     {
         DoubleEnemiesMod.Log($"[{__instance.gameObject.name}] HealthManagerDie: {__instance.isDead}, {__instance.hp}");
 
-        if (HealthManagerEvents.IsDead(__instance.hp))
+        SharedHPID sharedHPID = __instance.GetComponent<SharedHPID>();
+        if (sharedHPID != null)
         {
-            DoubleEnemiesMod.Log("death check");
-            HealthManagerEvents.RaiseOnDie(__instance);
+            SharedHPManager.ReportDeath(__instance, sharedHPID.ID);
         }
     }
     private static void TryDuplicateInstance(HealthManager healthManager)
@@ -226,8 +226,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
         }
 
         bool isSharedHPEnabled = false;
-        // Grand Mother Silk doesn't work due to extra healthbars
-        if (EnableSharedHP.Value && type == EnemyType.Boss && gameObject.name != "Silk Boss")
+        if (EnableSharedHP.Value && type == EnemyType.Boss)
         {
             isSharedHPEnabled = true;
             Log($"[SharedHP] Activated for {gameObject.name}: {healthManager.hp}");

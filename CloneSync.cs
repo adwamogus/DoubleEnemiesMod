@@ -16,8 +16,6 @@ public class CloneSync : MonoBehaviour
     private PlayMakerFSM originalFSM;
     private PlayMakerFSM cloneFSM;
 
-    private bool isSharedHPEnabled;
-
     private bool isSynced = false;
 
     private string lastLoggedState = "";
@@ -45,17 +43,6 @@ public class CloneSync : MonoBehaviour
             {
                 cloneHealth.TookDamage += OnLastJudgeDamaged;
             }
-
-            HealthManagerEvents.OnDie += OnDeathOriginal;
-            HealthManagerEvents.OnDie += OnDeathClone;
-        }
-    }
-    private void OnDisable()
-    {
-        if (isSharedHPEnabled)
-        {
-            HealthManagerEvents.OnDie -= OnDeathOriginal;
-            HealthManagerEvents.OnDie -= OnDeathClone;
         }
     }
     private void LateUpdate()
@@ -92,52 +79,9 @@ public class CloneSync : MonoBehaviour
             DoubleEnemiesMod.Log($"[{gameObject.name}] Stopped syncing: {activeStateName}");
         }
     }
-    private void OnDeathOriginal(HealthManager sourceHealthManager)
-    {
-        if (originalHealth.GetInstanceID() == sourceHealthManager.GetInstanceID())
-        {
-            if (!HealthManagerEvents.IsDead(cloneHealth.hp))
-            {
-                DoubleEnemiesMod.Log($"[SharedHP Kill] SHP[{gameObject.name}/{cloneHealth.hp}]");
-                cloneHealth.ApplyExtraDamage(cloneHealth.hp);
-            }
-        }
-    }
-    private void OnDeathClone(HealthManager sourceHealthManager)
-    {
-        if (cloneHealth.GetInstanceID() == sourceHealthManager.GetInstanceID())
-        {
-            if (!HealthManagerEvents.IsDead(originalHealth.hp))
-            {
-                DoubleEnemiesMod.Log($"[SharedHP Kill] SHP[{originalHealth.gameObject.name}/{originalHealth.hp}]");
-                originalHealth.ApplyExtraDamage(originalHealth.hp);
-            }
-        }
-    }
     private void OnLastJudgeDamaged()
     {
         marker.LastJudgeFix();
         cloneHealth.TookDamage -= OnLastJudgeDamaged;
-    }
-}
-
-public static class HealthManagerEvents
-{
-    public static Action<HealthManager> OnDie;
-
-    public static void RaiseOnDie(HealthManager hm)
-    {
-        OnDie?.Invoke(hm);
-    }
-    public static bool IsDead(int currentHP)
-    {
-        if (currentHP <= 0 || currentHP == 99999)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
     }
 }
