@@ -85,7 +85,18 @@ public class DoubleEnemiesMod : BaseUnityPlugin
 
         foreach (var root in scene.GetRootGameObjects())
         {
-            if (root.name.Contains("Wisp Flame Lantern") || root.name.Contains("Boss Scene"))
+            if (root.name.Contains("Wisp Flame Lantern") && EnableEnemies.Value)
+            {
+
+                Log($"[Clone] Cloning {root.name} in {scene.name}");
+                var clone = GameObject.Instantiate(
+                    root,
+                    root.transform.position,
+                    root.transform.rotation,
+                    root.transform.parent
+                );
+            }
+            if (root.name.Contains("Boss Scene") && EnableBosses.Value)
             {
 
                 Log($"[Clone] Cloning {root.name} in {scene.name}");
