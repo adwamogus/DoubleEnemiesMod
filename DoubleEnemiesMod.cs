@@ -9,7 +9,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.7.0")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.7.1")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
@@ -240,7 +240,15 @@ public class DoubleEnemiesMod : BaseUnityPlugin
         if (EnableSharedHP.Value && type == EnemyType.Boss)
         {
             isSharedHPEnabled = true;
-            Log($"[SharedHP] Activated for {gameObject.name}: {healthManager.hp}");
+
+            foreach (var blocked in StringLists.SharedHPBlacklist)
+            {
+                if (gameObject.scene.name.Contains(blocked))
+                {
+                    isSharedHPEnabled = false;
+                    Log($"[Blacklist] {gameObject.scene.name} is on the sharedHP blacklist");
+                }
+            }
         }
 
         // Mark the original object before cloning

@@ -51,7 +51,22 @@ public static class SharedHPManager
     }
     public static void ReportDeath(HealthManager healthManager, int id)
     {
-        SharedHpInstances[id].DeathSync();
+        if (IsDead(healthManager.hp))
+        {
+            SharedHpInstances[id].DeathSync();
+        }
+        
+    }
+    public static bool IsDead(int currentHP)
+    {
+        if (currentHP <= 0 || currentHP == 99999)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
 
@@ -113,7 +128,7 @@ public class SharedHPInstance
     {
         foreach (HealthManager hp in hpComponents)
         {
-            if (!IsDead(hp.hp))
+            if (!SharedHPManager.IsDead(hp.hp))
             {
                 DamageTagInstance damageTag = new DamageTagInstance();
                 damageTag.isHeroDamage = true;
@@ -123,17 +138,6 @@ public class SharedHPInstance
 
                 hp.ApplyTagDamage(damageTag);
             }
-        }
-    }
-    public bool IsDead(int currentHP)
-    {
-        if (currentHP <= 0 || currentHP == 99999)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
         }
     }
 }

@@ -12,11 +12,16 @@
         "Shadow_18",
         "Dust_Chef",
         "Bone_18",
+        "Bone_East_08_boss_beastfly"
     };
     public static readonly string[] SyncBlacklist = new string[]
     {
         "Mossbone Mother A",
         "Mossbone Mother B",
+    };
+    public static readonly string[] SharedHPBlacklist = new string[]
+    {
+        "Dock_09", // Signis and gron
     };
     public static readonly string[] SyncStates = new string[]
     {
@@ -49,7 +54,6 @@
         "Muckmen Control",
         "song_golem",
         "First Weaver",
-        "First Weaver",
         "Silk Boss",
         "Lace Boss2 New",
     };
@@ -61,11 +65,11 @@
         "song_golem",
         "Vampire Gnat Boss",
         "First Weaver",
-        "First Weaver",
         "Silk Boss",
         "Lace Boss2 New",
         "Swamp Shaman",
         "Roachkeeper Chef",
+        "Bone Flyer Giant",
     };
     public static readonly string[] ArenaFilterKeywords = new string[]
     {
