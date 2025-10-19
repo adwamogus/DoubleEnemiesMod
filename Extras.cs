@@ -45,6 +45,9 @@
         "Ready",
         "Wall", // Flint bug
         "Ambush Ready",
+        "Pointing", // signis
+        "Arena Start",
+        "Roar",
     };
     public static readonly string[] ParentKeywords = new string[]
     {
@@ -70,6 +73,7 @@
         "Swamp Shaman",
         "Roachkeeper Chef",
         "Bone Flyer Giant",
+        "Lost Lace Boss",
     };
     public static readonly string[] ArenaFilterKeywords = new string[]
     {
