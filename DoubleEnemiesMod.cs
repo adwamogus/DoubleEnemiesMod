@@ -21,6 +21,7 @@ public class DoubleEnemiesMod : BaseUnityPlugin
     public static ConfigEntry<bool> EnableBosses;
 
     public static ConfigEntry<bool> EnableSharedHP;
+    public static ConfigEntry<bool> EnableSharedHPUnsafeMode;
 
     private static ManualLogSource logger;
     private void Awake()
@@ -67,6 +68,13 @@ public class DoubleEnemiesMod : BaseUnityPlugin
             "Enable Shared HP",
             true,
             "Multiplies boss hp with the Multiplier and shares all damage between bosses. Supported bosses will now die at the same time."
+            );
+
+        EnableSharedHPUnsafeMode = Config.Bind(
+            "Control",
+            "Enable Shared HP",
+            false,
+            "Removes saveguards for SharedHP. This forces the system to accept any amount of enemies as a valid target. Turning this on may result in unexpected behaviour of certain bosses/arenas."
             );
 
         Logger.LogInfo("Double Enemies Mod loaded");

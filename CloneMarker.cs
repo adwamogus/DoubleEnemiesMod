@@ -24,6 +24,12 @@ public class CloneMarker : MonoBehaviour
         this.original = original;
         this.originalHealth = healthManager;
 
+        // Special case
+        if (healthManager.gameObject.name.Contains("Roachkeeper Chef Tiny"))
+        {
+            return;
+        }
+
         SongGolemFix();
 
         DeleteMossBerry();
@@ -45,6 +51,12 @@ public class CloneMarker : MonoBehaviour
                 if (originalHealths.Length != cloneHealths.Length)
                 {
                     DoubleEnemiesMod.Log($"[{gameObject.name}] Non equal amount of Healthcomponents ({originalHealths.Length},{cloneHealths.Length})");
+                    return;
+                }
+                // Only support double boss scenes and no enemy spawning bosses
+                if (originalHealths.Length > 2 && !DoubleEnemiesMod.EnableSharedHPUnsafeMode.Value)
+                {
+                    DoubleEnemiesMod.Log($"[{gameObject.name}] stopped linking objects due to too high object counts causing instability: {originalHealths.Length}");
                     return;
                 }
 
@@ -69,15 +81,6 @@ public class CloneMarker : MonoBehaviour
         {
             DoubleEnemiesMod.Log($"[{_originalHealth.gameObject.name}] {_originalHealth.gameObject.name} and {_cloneHealth.gameObject.name} do not share a name");
             return;
-        }
-
-        foreach (var blocked in StringLists.SyncBlacklist)
-        {
-            if (_originalHealth.gameObject.name.Contains(blocked))
-            {
-                DoubleEnemiesMod.Log($"[{_originalHealth.gameObject.name}] is on the sync blacklist");
-                return;
-            }
         }
         
         DoubleEnemiesMod.Log($"[{gameObject.name}] Pairing {_originalHealth.gameObject.name} with {_cloneHealth.gameObject.name}");
