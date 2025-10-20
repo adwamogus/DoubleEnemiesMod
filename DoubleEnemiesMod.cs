@@ -9,7 +9,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.7.1")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.7.2")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
@@ -72,9 +72,9 @@ public class DoubleEnemiesMod : BaseUnityPlugin
 
         EnableSharedHPUnsafeMode = Config.Bind(
             "Control",
-            "Enable Shared HP",
+            "Enable Shared HP unsafe mode",
             false,
-            "Removes saveguards for SharedHP. This forces the system to accept any amount of enemies as a valid target. Turning this on may result in unexpected behaviour of certain bosses/arenas."
+            "Removes saveguards for SharedHP. This forces the system to accept arenas and any amount of enemies as a valid target. Turning this on may result in unexpected behaviour of certain bosses/arenas."
             );
 
         Logger.LogInfo("Double Enemies Mod loaded");
@@ -248,15 +248,10 @@ public class DoubleEnemiesMod : BaseUnityPlugin
         if (EnableSharedHP.Value && type == EnemyType.Boss)
         {
             isSharedHPEnabled = true;
-
-            foreach (var blocked in StringLists.SharedHPBlacklist)
-            {
-                if (gameObject.scene.name.Contains(blocked))
-                {
-                    isSharedHPEnabled = false;
-                    Log($"[Blacklist] {gameObject.scene.name} is on the sharedHP blacklist");
-                }
-            }
+        }
+        if (EnableSharedHP.Value && EnableSharedHPUnsafeMode.Value && type == EnemyType.Arena)
+        {
+            isSharedHPEnabled = true;
         }
 
         // Mark the original object before cloning

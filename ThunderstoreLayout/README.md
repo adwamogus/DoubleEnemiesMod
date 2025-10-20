@@ -15,6 +15,7 @@ It includes options to:
 - **Adjust the multiplier** for how many copies of each enemy are spawned.
 - **Filter by type** (Normal Enemies, Arena Enemies, Bosses).
 - **Enable Shared HP** between cloned bosses for synchronized fights.
+- **Enable unsafe mode** for arenas to be affected by Shared HP.
 
 ---
 
@@ -31,7 +32,7 @@ A few special bosses are automatically excluded to maintain stability.
 ## Configuration
 
 After launching the game once with the mod installed, you can edit the config file in  
-`BepInEx/config/adw.doubleenemies.cfg`
+`BepInEx/config/com.adwamogus.skdoubleenemiesmod.cfg`
 
 Main options:
 - **Multiplier:** Change how many clones are created.

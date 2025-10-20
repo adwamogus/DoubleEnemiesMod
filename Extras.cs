@@ -12,16 +12,7 @@
         "Shadow_18",
         "Dust_Chef",
         "Bone_18",
-        "Bone_East_08_boss_beastfly"
-    };
-    public static readonly string[] SyncBlacklist = new string[]
-    {
-        "Mossbone Mother A",
-        "Mossbone Mother B",
-    };
-    public static readonly string[] SharedHPBlacklist = new string[]
-    {
-        "Dock_09", // Signis and gron
+        "Bone_East_08_boss_beastfly",
     };
     public static readonly string[] SyncStates = new string[]
     {
