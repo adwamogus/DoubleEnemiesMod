@@ -34,45 +34,43 @@ public class CloneMarker : MonoBehaviour
 
         DeleteMossBerry();
 
-        if (enemyType != EnemyType.Arena)
+        if (enemyType == EnemyType.Arena)
         {
-            cloneHealth = GetComponent<HealthManager>();
+            BattleSceneFix();
+        }
 
-            if(cloneHealth == null)
+        cloneHealth = GetComponent<HealthManager>();
+
+        if(cloneHealth == null)
+        {
+            var cloneHealths = GetComponentsInChildren<HealthManager>();
+            cloneHealths = cloneHealths.OrderBy(c => c.name)
+                                    .ToArray();
+
+            var originalHealths = original.GetComponentsInChildren<HealthManager>();
+            originalHealths = originalHealths.OrderBy(c => c.name)
+                                    .ToArray();
+
+            if (originalHealths.Length != cloneHealths.Length)
             {
-                var cloneHealths = GetComponentsInChildren<HealthManager>();
-                cloneHealths = cloneHealths.OrderBy(c => c.name)
-                                       .ToArray();
-
-                var originalHealths = original.GetComponentsInChildren<HealthManager>();
-                originalHealths = originalHealths.OrderBy(c => c.name)
-                                       .ToArray();
-
-                if (originalHealths.Length != cloneHealths.Length)
-                {
-                    DoubleEnemiesMod.Log($"[{gameObject.name}] Non equal amount of Healthcomponents ({originalHealths.Length},{cloneHealths.Length})");
-                    return;
-                }
-                // Only support double boss scenes and no enemy spawning bosses
-                if (originalHealths.Length > 2 && !DoubleEnemiesMod.EnableSharedHPUnsafeMode.Value)
-                {
-                    DoubleEnemiesMod.Log($"[{gameObject.name}] stopped linking objects due to too high object counts causing instability: {originalHealths.Length}");
-                    return;
-                }
-
-                for (int i = 0; i < originalHealths.Length; i++)
-                {
-                    SyncPair(originalHealths[i], cloneHealths[i], isSharedHPEnabled);
-                }
+                DoubleEnemiesMod.Log($"[{gameObject.name}] Non equal amount of Healthcomponents ({originalHealths.Length},{cloneHealths.Length})");
+                return;
             }
-            else
+            // Only support double boss scenes and no enemy spawning bosses
+            if (originalHealths.Length > 2 && !DoubleEnemiesMod.EnableSharedHPUnsafeMode.Value)
             {
-                SyncPair(originalHealth, cloneHealth, isSharedHPEnabled);
+                DoubleEnemiesMod.Log($"[{gameObject.name}] stopped linking objects due to too high object counts causing instability: {originalHealths.Length}");
+                return;
+            }
+
+            for (int i = 0; i < originalHealths.Length; i++)
+            {
+                SyncPair(originalHealths[i], cloneHealths[i], isSharedHPEnabled);
             }
         }
         else
         {
-            BattleSceneFix();
+            SyncPair(originalHealth, cloneHealth, isSharedHPEnabled);
         }
     }
     private void SyncPair(HealthManager _originalHealth, HealthManager _cloneHealth, bool isSharedHPEnabled)
