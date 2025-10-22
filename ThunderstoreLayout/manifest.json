@@ -1,7 +1,7 @@
 {
 	"name":"DoubleEnemiesMod",
 	"description":"Doubles every Enemy, Arena and Boss. Config options such as a multiplier, filters and extra features are available",
-	"version_number":"0.7.2",
+	"version_number":"0.7.3",
 	"website_url": "https://github.com/adwamogus/DoubleEnemiesMod",
 	"dependencies": ["BepInEx-BepInExPack_Silksong-5.4.2303"]
 }
