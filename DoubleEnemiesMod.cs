@@ -9,7 +9,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.7.2")]
+[BepInPlugin("com.adwamogus.skdoubleenemiesmod", "Silksong Double Enemies Mod", "0.7.3")]
 public class DoubleEnemiesMod : BaseUnityPlugin
 {
     public static ConfigEntry<int> Multiplier;
@@ -138,18 +138,11 @@ public class DoubleEnemiesMod : BaseUnityPlugin
     [HarmonyPatch(typeof(BattleScene), "StartBattle")]
     private static void OnBattleStart(BattleScene __instance)
     {
+        Log($"[BattleScenePatcher] BattleScene start detected");
         var marker = __instance.GetComponent<CloneMarker>();
         if (marker != null)
         {
-            if (marker.StartBattle != null)
-            {
-                marker.StartBattle.Invoke();
-                DoubleEnemiesMod.Log("[BattleScenePatcher] Started CloneScene");
-            }
-            else
-            {
-                DoubleEnemiesMod.Log("[BattleScenePatcher] No StartBattle subscribers on marker");
-            }
+            marker.StartBattleEvent.Invoke();
         }
     }
     [HarmonyPostfix]

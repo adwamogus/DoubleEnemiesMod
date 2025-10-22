@@ -137,6 +137,7 @@ public class SharedHPInstance
                 damageTag.nailElements = NailElements.None;
 
                 hp.ApplyTagDamage(damageTag);
+                DoubleEnemiesMod.Log($"[Death Sync/{name}] killed {hp.gameObject.name}");
             }
         }
     }

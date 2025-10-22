@@ -15,9 +15,9 @@ public class CloneMarker : MonoBehaviour
 
     private HealthManager cloneHealth;
 
-    private BattleScene cloneBattleScene;
+    private bool startBattleTriggered = false;
 
-    public Action StartBattle;
+    public Action StartBattleEvent;
 
     public void CopyState(GameObject original, HealthManager healthManager, bool isSharedHPEnabled, EnemyType enemyType)
     {
@@ -37,6 +37,11 @@ public class CloneMarker : MonoBehaviour
         if (enemyType == EnemyType.Arena)
         {
             BattleSceneFix();
+
+            if (!DoubleEnemiesMod.EnableSharedHPUnsafeMode.Value)
+            {
+                return;
+            }
         }
 
         cloneHealth = GetComponent<HealthManager>();
@@ -121,7 +126,7 @@ public class CloneMarker : MonoBehaviour
     }
     private void BattleSceneFix()
     {
-        cloneBattleScene = GetComponent<BattleScene>();
+        BattleScene cloneBattleScene = GetComponent<BattleScene>();
         if (cloneBattleScene != null)
         {
             if (gameObject.scene.name.Contains("Memory_Coral_Tower"))
@@ -134,15 +139,38 @@ public class CloneMarker : MonoBehaviour
                 CloneMarker marker = original.GetComponent<CloneMarker>();
                 if (marker != null)
                 {
-                    marker.StartBattle += cloneBattleScene.StartBattle;
+                    marker.LinkBattleScene(this);
+                    marker.StartBattleEvent += StartBattle;
                     DoubleEnemiesMod.Log("Connected to original BattleScene");
                 }
                 else
                 {
-                    DoubleEnemiesMod.Log("original BattleScene hase no marker");
+                    DoubleEnemiesMod.Log("original BattleScene has no marker");
                 }
                 
             }
+        }
+    }
+    public void LinkBattleScene(CloneMarker clone)
+    {
+        BattleScene originalBattleScene = GetComponent<BattleScene>();
+        if (originalBattleScene != null)
+        {
+            clone.StartBattleEvent += clone.StartBattle;
+        }
+        else
+        {
+            DoubleEnemiesMod.Log($"BattleScene link failed on object {gameObject.name}");
+        }
+    }
+    public void StartBattle()
+    {
+        var battleScene = GetComponent<BattleScene>();
+
+        if (!startBattleTriggered)
+        {
+            startBattleTriggered = true;
+            battleScene.StartBattle();
         }
     }
     private void DeleteMossBerry()
