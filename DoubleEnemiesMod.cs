@@ -79,7 +79,6 @@ public class DoubleEnemiesMod : BaseUnityPlugin
 
         Logger.LogInfo("Double Enemies Mod loaded");
         Harmony.CreateAndPatchAll(typeof(DoubleEnemiesMod));
-
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
     private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)

@@ -5,6 +5,7 @@
         "Crystal Drifter",
         "Zap Core Enemy",
         "Music Box Bell",
+        "Bone Goomba Bounce Fly",
     };
     public static readonly string[] BlacklistedScenes = new string[]
     {
