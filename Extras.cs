@@ -58,7 +58,7 @@
         "Boss Scene",
         "Splinter Queen",
         "song_golem",
-        "Vampire Gnat Boss",
+        "Vampire Gnat",
         "First Weaver",
         "Silk Boss",
         "Lace Boss2 New",
@@ -66,6 +66,7 @@
         "Roachkeeper Chef",
         "Bone Flyer Giant",
         "Lost Lace Boss",
+        "Coral Warrior Grey",
     };
     public static readonly string[] ArenaFilterKeywords = new string[]
     {
